@@ -120,7 +120,7 @@ class SQLiteDatabase {
         if (!this.db) throw new Error('Database not connected');
 
         return new Promise((resolve, reject) => {
-            this.db!.get('SELECT * FROM users WHERE jid = ?', [jid], (err, row) => {
+            this.db!.get('SELECT * FROM users WHERE jid = ?', [jid], (err, row: User | undefined) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -152,7 +152,7 @@ class SQLiteDatabase {
         if (!this.db) throw new Error('Database not connected');
 
         return new Promise((resolve, reject) => {
-            this.db!.get('SELECT * FROM groups WHERE jid = ?', [jid], (err, row) => {
+            this.db!.get('SELECT * FROM groups WHERE jid = ?', [jid], (err, row: Group | undefined) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -202,7 +202,7 @@ class SQLiteDatabase {
         if (!this.db) throw new Error('Database not connected');
 
         return new Promise((resolve, reject) => {
-            this.db!.get('SELECT value FROM settings WHERE key = ?', [key], (err, row) => {
+            this.db!.get('SELECT value FROM settings WHERE key = ?', [key], (err, row: { value?: string } | undefined) => {
                 if (err) {
                     reject(err);
                 } else {
