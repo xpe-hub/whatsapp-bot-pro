@@ -1,66 +1,126 @@
-<div align="center">
-<a href="https://ibb.co/wQ4GK21"><img src="https://i.ibb.co/HPqwr9Q/whatsapp-botto-void-init.png" alt="whatsapp-botto-void-init" border="0"></a>
+# XPE WhatsApp Bot
 
-# ** WhatsApp Bot 🤹 **
+🤖 **Bot de WhatsApp moderno desarrollado con TypeScript y Baileys v6**
 
-[![CodeFactor](https://www.codefactor.io/repository/github/prajjwaldatir/kaoi/badge)](https://www.codefactor.io/repository/github/prajjwaldatir/kaoi)
+Un bot de WhatsApp simplificado y eficiente, perfecto para desarrollo local y despliegue en Railway.
 
-## [![WhatsApp Group](https://img.shields.io/badge/WhatsApp-25D366?style=for-the-badge&logo=whatsapp&logoColor=white)](https://chat.whatsapp.com/FUKwD5I2nJC9TOgqxd1RiP) [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/) [![NodeJs](https://img.shields.io/badge/Node.js-43853D?style=for-the-badge&logo=node.js&logoColor=white)](https://nodejs.org/en/)
+## 🚀 Instalación Local
 
-> A Fully Modular and Efficient Bot <br>
+### Prerrequisitos
+- **Node.js 20+** ([Descargar aquí](https://nodejs.org/))
+- **npm** (incluido con Node.js)
 
-Button : If you are deploying normally
+### Configuración Rápida
 
-[![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy?template=https://github.com/the-great-M-D/Kaoi/blob/main)
+1. **Clonar el repositorio:**
+   ```bash
+   git clone https://github.com/xpe-hub/xpe-bot.git
+   cd xpe-bot
+   ```
 
-Button : If you are deploying from a fork
+2. **Instalar dependencias:**
+   ```bash
+   npm install
+   ```
 
-[![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy)
+3. **Configurar variables de entorno:**
+   Crea un archivo `.env`:
+   ```env
+   # Variables esenciales
+   SESSION_NAME=xpe-bot
+   OPENAI_API_KEY=tu_api_key_aqui  # Opcional
+   PORT=3000
+   ```
 
-Button : If you are deploying and using Railway
+4. **Compilar TypeScript:**
+   ```bash
+   npm run build
+   ```
 
-[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/new/template?template=https%3A%2F%2Fgithub.com%2FPrajjwalDatir%2FKaoi%2F&envs=PREFIX%2CSESSION%2CMODS%2CCRON%2CMONGO_URI%2CGOOGLE_API_KEY%2CCHAT_BOT_URL&optionalEnvs=MODS%2CCRON%2CGOOGLE_API_KEY%2CCHAT_BOT_URL&PREFIXDesc=Prefix+of+your+bot&SESSIONDesc=A+string+for+the+session+to+be+classified+and+to+get+access+to+the+server+endpoints&MODSDesc=The+phone+numbers+of+the+users+who+you+want+to+be+admin+for+the+bot+%28should+be+in+international+format+without+%2B+and+multiple+numbers+must+be+separated+by+a+comma+%5C%22%2C%5C%22%29&CRONDesc=Cron+string+to+clear+chats+in+a+cycle&MONGO_URIDesc=A+secret+String+for+Mongodb+Connection+%28Required%29&GOOGLE_API_KEYDesc=Google+API+key+for+Google+searches+for+MODS+%28Not+Required%29&CHAT_BOT_URLDesc=BrainShop+API+Brain+url)
+5. **¡Ejecutar el bot!**
+   ```bash
+   npm start
+   ```
 
-Use any one of the above to deploy
+## 📱 Conexión WhatsApp
 
-</div><br/>
-<br/>
+1. **Ejecuta el bot** con `npm start`
+2. **Escanea el código QR** que aparece en la terminal
+3. **Abre WhatsApp** en tu teléfono
+4. **Ve a "Dispositivos vinculados"**
+5. **Escanea el código QR** con la cámara de WhatsApp
+6. **¡Listo!** El bot estará conectado
 
-## ✨ Highlights
+## 🔧 Comandos Disponibles
 
--   Fully Modular Design
--   Object Oriented
--   Written in [TypeScript](https://www.typescriptlang.org/)
--   Self-Restoring Auth
--   Built with [Baileys](https://github.com/adiwajshing/baileys) (The Best
-    WhatsApp Library Out There)
+Una vez conectado a WhatsApp:
+- `!ping` - Verificar que el bot está funcionando
+- `!info` - Información del estado del bot  
+- `!help` - Lista de comandos disponibles
 
-## 💻 Deploy/Hosting Guide
+## 🛠️ Desarrollo
 
--   Section Moved to
-    [Kaoi-Guides](https://github.com/Hiroto77/Kaoi-Guides/blob/main/README.md)
+**Modo desarrollo (con recarga automática):**
+```bash
+npm run dev
+```
 
-## 🍥 Features of the Repo
+**Health checks:**
+- **Health:** http://localhost:3000/health
+- **Status:** http://localhost:3000/status
 
--   To view all features, click
-    here➡️[M-D_featuresList.md](https://github.com/the-great-M-D/Kaoi/blob/main/Features.md)
+## 📁 Estructura del Proyecto
 
-## 🤹 Contribution
+```
+src/
+├── index.ts              # Entry point principal
+├── lib/
+│   └── WhatsAppBot.ts    # Lógica principal del bot
+└── database/
+    └── SQLiteDatabase.ts # Base de datos SQLite
+```
 
--   Feel free to open issues regarding any problems or if you have any feature
-    requests
--   Make sure to follow the ESLint Rules while editing the code and run
-    `yarn run prettier-format` before opening PRs
+## 🚨 Solución de Problemas
 
-## 🤝 Contributors
--   the-great-M-D
+**Error: "Cannot find module"**
+```bash
+npm install
+npm run build
+```
 
+**Error: "WhatsApp not connected"**
+- Escanea el código QR en la terminal
+- Verifica que tu teléfono tenga WhatsApp Web activo
 
-### 🟢 WhatsApp Support Group
+**Error: "Port 3000 in use"**
+- Cambia el puerto en `.env` (ej: PORT=3001)
+- O detén el proceso que usa el puerto
 
-# [![WhatsApp Group](https://img.shields.io/badge/WhatsApp-25D366?style=for-the-badge&logo=whatsapp&logoColor=white)](https://chat.whatsapp.com/FUKwD5I2nJC9TOgqxd1RiP)
+## 📝 Variables de Entorno
 
-## 📄 License
+| Variable | Descripción | Requerido |
+|----------|-------------|-----------|
+| `SESSION_NAME` | Nombre de sesión del bot | ✅ |
+| `OPENAI_API_KEY` | API key de OpenAI (opcional) | ❌ |
+| `PORT` | Puerto del servidor web | ❌ (3000) |
 
-Distributed under the GNU AFFERO GENERAL PUBLIC License. See [LICENSE](/LICENSE)
-for more information.
+## 🔒 Seguridad
+
+- **Nunca compartas** tu `SESSION_NAME` ni API keys
+- **Reinicia el bot** si cambias variables de entorno
+- **Mantén actualizado** Node.js y dependencias
+
+## 🚀 Despliegue en Railway
+
+El bot está optimizado para Railway con:
+- ✅ **npm** como package manager (no yarn)
+- ✅ **Node.js 20** configurado
+- ✅ **Health endpoints** para Railway
+- ✅ **SQLite** (base de datos embebida)
+
+## 📞 Soporte
+
+Si tienes problemas:
+1. Verifica Node.js 20+: `node --version`
+2. Limpia caché: `npm cache clean --force`
+3. Reinstala: `rm -rf node_modules && npm install`
