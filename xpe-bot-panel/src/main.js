@@ -208,14 +208,14 @@ function createWindow() {
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
-      preload: path.join(__dirname, 'src', 'preload.js')
+      preload: path.join(__dirname, 'preload.js')
     },
     icon: path.join(__dirname, 'assets', 'icon.png'),
     backgroundColor: '#1a1a2e',
     show: false
   });
 
-  mainWindow.loadFile(path.join(__dirname, 'index.html'));
+  mainWindow.loadFile(path.join(__dirname, '..', 'index.html'));
 
   mainWindow.once('ready-to-show', () => {
     mainWindow.show();
