@@ -4,14 +4,15 @@
   "description": "Panel de control para XPE-BOT con Editor IA",
   "main": "src/main.js",
   "scripts": {
-    "start": "set ELECTRON_DISABLE_SANDBOX=1 && electron . --disable-gpu --disable-software-rasterizer",
-    "build": "electron-builder --win --x64"
+    "start": "electron .",
+    "build": "electron-builder --win --x64 --portable",
+    "build-nsis": "electron-builder --win --x64"
   },
   "author": "XPE-TEAM",
   "license": "MIT",
   "devDependencies": {
     "electron": "25.8.0",
-    "electron-builder": "^24.9.1"
+    "electron-builder": "24.9.1"
   },
   "dependencies": {
     "node-machine-id": "^1.1.12"
@@ -19,7 +20,31 @@
   "build": {
     "appId": "com.xpeteam.xpebotpanel",
     "productName": "XPE-BOT Panel",
-    "win": { "target": "nsis", "icon": "assets/icon.ico" },
-    "nsis": { "oneClick": false, "allowToChangeInstallationDirectory": true }
+    "directories": {
+      "output": "dist"
+    },
+    "win": {
+      "target": ["portable"],
+      "icon": "assets/icon.ico",
+      "sign": false
+    },
+    "portable": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "sfxPath": "node_modules/electron-builder-portable/7z.sfx"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    },
+    "files": [
+      "**/*",
+      "!node_modules/*",
+      "!dist/*",
+      "!backups/*",
+      "!.git/*"
+    ],
+    "asar": false,
+    "extraResources": []
   }
 }
