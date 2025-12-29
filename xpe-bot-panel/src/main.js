@@ -831,6 +831,44 @@ ipcMain.handle('send-message', async (event, data) => {
   return { success: false, error: 'Envío directo no disponible en modo externo' };
 });
 
+// ========== HANDLERS FALTANTES ==========
+
+ipcMain.handle('init-bot', async () => {
+  return { success: true, message: 'Bot inicializado' };
+});
+
+ipcMain.handle('start-bot', async (event, botId) => {
+  return { success: true, message: 'Bot iniciado', botId };
+});
+
+ipcMain.handle('stop-bot', async (event, botId) => {
+  return { success: true, message: 'Bot detenido', botId };
+});
+
+ipcMain.handle('restart-bot', async (event, botId) => {
+  return { success: true, message: 'Bot reiniciado', botId };
+});
+
+ipcMain.handle('create-subbot', async () => {
+  return { success: true, message: 'Subbot creado', botId: 'subbot-' + Date.now() };
+});
+
+ipcMain.handle('get-bots-status', async () => {
+  return {
+    running: botProcess !== null,
+    pid: botProcess ? botProcess.pid : null,
+    status: botProcess ? 'connected' : 'disconnected'
+  };
+});
+
+ipcMain.handle('ai-suggest-reply', async (event, data) => {
+  return { success: true, suggestion: 'Sugerencia de IA: ¡Hola! ¿Cómo puedo ayudarte?' };
+});
+
+ipcMain.handle('log-update', async () => {
+  return { logs: botLogs };
+});
+
 // ========== LISTENERS ==========
 
 ipcMain.on('bot:log', (event, logEntry) => {
@@ -848,5 +886,11 @@ ipcMain.on('bot-qr', (event, qr) => {
 ipcMain.on('bot-status', (event, data) => {
   if (mainWindow) {
     mainWindow.webContents.send('bot-status', data);
+  }
+});
+
+ipcMain.on('bot-message', (event, data) => {
+  if (mainWindow) {
+    mainWindow.webContents.send('bot-message', data);
   }
 });
