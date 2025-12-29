@@ -3,14 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>XPE-BOT Control Panel v2.0</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Rajdhani:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <title>XPE-BOT Control Panel</title>
     <style>
-        /* ==========================================
-           ESTILOS BASE
-           ========================================== */
         * {
             margin: 0;
             padding: 0;
@@ -20,7 +14,6 @@
         :root {
             --primary: #6366f1;
             --primary-dark: #4f46e5;
-            --primary-light: #818cf8;
             --success: #22c55e;
             --danger: #ef4444;
             --warning: #f59e0b;
@@ -34,20 +27,17 @@
             --text-dim: #64748b;
             --border: rgba(255, 255, 255, 0.1);
             --border-hover: rgba(255, 255, 255, 0.2);
-            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
         }
 
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: var(--bg-dark);
             color: var(--text);
             min-height: 100vh;
             overflow: hidden;
         }
 
-        /* ==========================================
-           FONDO ANIMADO
-           ========================================== */
+        /* Fondo */
         .background {
             position: fixed;
             top: 0;
@@ -56,219 +46,9 @@
             height: 100%;
             background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #16213e 100%);
             z-index: -1;
-            overflow: hidden;
         }
 
-        .background::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-image: radial-gradient(circle at 20% 80%, rgba(99, 102, 241, 0.1) 0%, transparent 50%),
-                              radial-gradient(circle at 80% 20%, rgba(168, 85, 247, 0.1) 0%, transparent 50%),
-                              radial-gradient(circle at 40% 40%, rgba(236, 72, 153, 0.05) 0%, transparent 30%);
-            animation: particleMove 20s ease-in-out infinite;
-        }
-
-        @keyframes particleMove {
-            0%, 100% { transform: scale(1) rotate(0deg); }
-            50% { transform: scale(1.1) rotate(5deg); }
-        }
-
-        .background::after {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: linear-gradient(45deg, transparent 40%, rgba(255, 255, 255, 0.02) 50%, transparent 60%);
-            animation: shimmer 10s linear infinite;
-        }
-
-        @keyframes shimmer {
-            0% { transform: translateX(-100%) rotate(45deg); }
-            100% { transform: translateX(100%) rotate(45deg); }
-        }
-
-        /* ==========================================
-           VENTANA Y LAYOUT
-           ========================================== */
-        .window {
-            width: 100vw;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .main-container {
-            display: none;
-            flex: 1;
-            overflow: hidden;
-        }
-
-        .main-container.active {
-            display: flex;
-        }
-
-        /* ==========================================
-           TITLE BAR
-           ========================================== */
-        .titlebar {
-            height: 40px;
-            background: rgba(0, 0, 0, 0.5);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 10px;
-            -webkit-app-region: drag;
-            border-bottom: 1px solid var(--border);
-            flex-shrink: 0;
-        }
-
-        .titlebar-title {
-            font-family: 'Rajdhani', sans-serif;
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--text);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .titlebar-title span {
-            color: var(--primary);
-        }
-
-        .titlebar-buttons {
-            display: flex;
-            gap: 5px;
-            -webkit-app-region: no-drag;
-        }
-
-        .titlebar-btn {
-            width: 30px;
-            height: 30px;
-            border: none;
-            background: var(--bg-glass);
-            color: var(--text);
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .titlebar-btn:hover {
-            background: var(--bg-glass-hover);
-        }
-
-        .titlebar-btn.close:hover {
-            background: var(--danger);
-        }
-
-        /* ==========================================
-           SIDEBAR
-           ========================================== */
-        .sidebar {
-            width: 260px;
-            background: var(--bg-card);
-            border-right: 1px solid var(--border);
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            overflow-y: auto;
-        }
-
-        .logo {
-            text-align: center;
-            margin-bottom: 30px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .logo h1 {
-            font-family: 'Rajdhani', sans-serif;
-            font-size: 28px;
-            font-weight: 700;
-            background: linear-gradient(135deg, var(--primary), #a855f7);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .logo p {
-            font-size: 11px;
-            color: var(--text-muted);
-            margin-top: 5px;
-        }
-
-        .nav-section {
-            margin-bottom: 20px;
-        }
-
-        .nav-section-title {
-            font-size: 11px;
-            text-transform: uppercase;
-            color: var(--text-dim);
-            margin-bottom: 10px;
-            padding-left: 15px;
-            letter-spacing: 1px;
-        }
-
-        .nav-item {
-            padding: 12px 15px;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.2s;
-            margin-bottom: 5px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            color: var(--text-muted);
-            font-size: 14px;
-        }
-
-        .nav-item:hover {
-            background: var(--bg-glass);
-            color: var(--text);
-        }
-
-        .nav-item.active {
-            background: rgba(99, 102, 241, 0.2);
-            color: var(--primary-light);
-            border-left: 3px solid var(--primary);
-        }
-
-        .nav-item .badge {
-            margin-left: auto;
-            font-size: 10px;
-            padding: 2px 6px;
-            border-radius: 10px;
-            background: var(--primary);
-        }
-
-        /* ==========================================
-           MAIN CONTENT
-           ========================================== */
-        .main-content {
-            flex: 1;
-            padding: 25px;
-            overflow-y: auto;
-            display: none;
-        }
-
-        .main-content.active {
-            display: block;
-        }
-
-        /* ==========================================
-           PANTALLA DE LOGIN
-           ========================================== */
+        /* Pantalla de Login */
         .login-screen {
             position: fixed;
             top: 0;
@@ -288,28 +68,23 @@
         .login-card {
             background: var(--bg-card);
             border: 1px solid var(--border);
-            border-radius: 20px;
+            border-radius: 16px;
             padding: 40px;
-            width: 420px;
+            width: 400px;
             text-align: center;
-            backdrop-filter: blur(20px);
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
         }
 
-        .login-card h2 {
-            font-family: 'Rajdhani', sans-serif;
-            font-size: 28px;
+        .login-card h1 {
+            font-size: 24px;
             margin-bottom: 10px;
-            background: linear-gradient(135deg, var(--primary), #a855f7);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            color: var(--primary);
         }
 
         .login-card p {
             color: var(--text-muted);
-            margin-bottom: 30px;
-            font-size: 13px;
+            margin-bottom: 25px;
+            font-size: 14px;
         }
 
         .input-group {
@@ -320,12 +95,12 @@
         .input-group label {
             display: block;
             text-align: left;
-            font-size: 12px;
+            font-size: 13px;
             color: var(--text-muted);
             margin-bottom: 8px;
         }
 
-        .input-group input, .input-group textarea, .input-group select {
+        .input-group input {
             width: 100%;
             padding: 12px 15px;
             border: 1px solid var(--border);
@@ -335,22 +110,13 @@
             font-size: 14px;
             outline: none;
             transition: all 0.2s;
-            font-family: inherit;
         }
 
-        .input-group input:focus, .input-group textarea:focus, .input-group select:focus {
+        .input-group input:focus {
             border-color: var(--primary);
             box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
         }
 
-        .input-group textarea {
-            resize: vertical;
-            min-height: 100px;
-        }
-
-        /* ==========================================
-           BOTONES
-           ========================================== */
         .btn {
             padding: 12px 25px;
             border: none;
@@ -368,6 +134,7 @@
         .btn-primary {
             background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             color: white;
+            width: 100%;
         }
 
         .btn-primary:hover {
@@ -403,7 +170,6 @@
 
         .btn-secondary:hover {
             background: var(--bg-glass-hover);
-            border-color: var(--border-hover);
         }
 
         .btn-sm {
@@ -411,22 +177,178 @@
             font-size: 12px;
         }
 
-        .btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none !important;
+        .license-info {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+            font-size: 12px;
         }
 
-        /* ==========================================
-           TARJETAS Y ESTADÍSTICAS
-           ========================================== */
+        .license-info p {
+            margin-bottom: 8px;
+        }
+
+        .license-demo {
+            color: var(--primary);
+            font-family: monospace;
+            font-size: 11px;
+        }
+
+        /* Ventana Principal */
+        .window {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .main-container {
+            display: none;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .main-container.active {
+            display: flex;
+        }
+
+        /* Title Bar */
+        .titlebar {
+            height: 36px;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 10px;
+            -webkit-app-region: drag;
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
+        }
+
+        .titlebar-title {
+            font-size: 13px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .titlebar-title span {
+            color: var(--primary);
+        }
+
+        .titlebar-buttons {
+            display: flex;
+            gap: 5px;
+            -webkit-app-region: no-drag;
+        }
+
+        .titlebar-btn {
+            width: 28px;
+            height: 28px;
+            border: none;
+            background: var(--bg-glass);
+            color: var(--text);
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .titlebar-btn:hover {
+            background: var(--bg-glass-hover);
+        }
+
+        .titlebar-btn.close:hover {
+            background: var(--danger);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 220px;
+            background: var(--bg-card);
+            border-right: 1px solid var(--border);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .logo h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .logo p {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 5px;
+        }
+
+        .nav-section {
+            margin-bottom: 20px;
+        }
+
+        .nav-section-title {
+            font-size: 10px;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            margin-bottom: 10px;
+            padding-left: 10px;
+            letter-spacing: 1px;
+        }
+
+        .nav-item {
+            padding: 10px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+        .nav-item:hover {
+            background: var(--bg-glass);
+            color: var(--text);
+        }
+
+        .nav-item.active {
+            background: rgba(99, 102, 241, 0.2);
+            color: var(--primary);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 25px;
+            overflow-y: auto;
+            display: none;
+        }
+
+        .main-content.active {
+            display: block;
+        }
+
         .page-header {
             margin-bottom: 25px;
         }
 
         .page-header h1 {
-            font-family: 'Rajdhani', sans-serif;
-            font-size: 24px;
+            font-size: 22px;
             margin-bottom: 5px;
         }
 
@@ -435,38 +357,30 @@
             font-size: 13px;
         }
 
+        /* Stats Grid */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
             margin-bottom: 25px;
         }
 
         .stat-card {
             background: var(--bg-card);
             border: 1px solid var(--border);
-            border-radius: 15px;
-            padding: 20px;
-            transition: all 0.2s;
-        }
-
-        .stat-card:hover {
-            border-color: var(--primary);
+            border-radius: 12px;
+            padding: 18px;
         }
 
         .stat-card h3 {
-            font-size: 12px;
+            font-size: 11px;
             color: var(--text-muted);
             text-transform: uppercase;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            margin-bottom: 8px;
         }
 
         .stat-card .value {
-            font-family: 'Rajdhani', sans-serif;
-            font-size: 32px;
+            font-size: 26px;
             font-weight: 700;
         }
 
@@ -475,43 +389,40 @@
         .stat-card .value.warning { color: var(--warning); }
         .stat-card .value.info { color: var(--info); }
 
-        /* ==========================================
-           BOT CONTROL
-           ========================================== */
+        /* Card */
         .card {
             background: var(--bg-card);
             border: 1px solid var(--border);
-            border-radius: 15px;
-            padding: 25px;
-            margin-bottom: 25px;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
         }
 
         .card h2 {
-            font-family: 'Rajdhani', sans-serif;
-            font-size: 18px;
-            margin-bottom: 20px;
+            font-size: 16px;
+            margin-bottom: 15px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
         }
 
         .card-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
 
         .card-header h2 {
             margin-bottom: 0;
         }
 
+        /* Status Indicator */
         .status-indicator {
-            width: 12px;
-            height: 12px;
+            width: 10px;
+            height: 10px;
             border-radius: 50%;
             background: var(--danger);
-            animation: pulse 2s infinite;
         }
 
         .status-indicator.running, .status-indicator.online {
@@ -522,465 +433,45 @@
             background: var(--warning);
         }
 
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-
+        /* Control Buttons */
         .control-buttons {
             display: flex;
-            gap: 15px;
+            gap: 12px;
             flex-wrap: wrap;
         }
 
         .control-buttons .btn {
             flex: 1;
-            min-width: 120px;
+            min-width: 100px;
         }
 
-        /* ==========================================
-           BOTS LIST
-           ========================================== */
-        .bots-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 20px;
-        }
-
-        .bot-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 15px;
-            padding: 20px;
-            transition: all 0.2s;
-        }
-
-        .bot-card:hover {
-            border-color: var(--primary);
-        }
-
-        .bot-card.connected {
-            border-color: var(--success);
-        }
-
-        .bot-header {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 15px;
-        }
-
-        .bot-status-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: var(--text-dim);
-        }
-
-        .bot-status-dot.online {
-            background: var(--success);
-            box-shadow: 0 0 10px rgba(34, 197, 94, 0.5);
-        }
-
-        .bot-status-dot.offline {
-            background: var(--text-dim);
-        }
-
-        .bot-name {
-            font-weight: 600;
-            font-family: 'Rajdhani', sans-serif;
-            font-size: 16px;
-        }
-
-        .bot-phone {
-            font-size: 12px;
-            color: var(--text-muted);
-            margin-left: auto;
-        }
-
-        .bot-info {
-            margin-bottom: 15px;
-        }
-
-        .status-text {
-            font-size: 12px;
-            color: var(--text-muted);
-        }
-
-        .bot-actions {
-            display: flex;
-            gap: 10px;
-        }
-
-        .bot-actions .btn {
-            flex: 1;
-        }
-
-        /* ==========================================
-           MENSAJES
-           ========================================== */
-        .filters-bar {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-
-        .filters-bar .input-group {
-            flex: 1;
-            min-width: 150px;
-            margin-bottom: 0;
-        }
-
-        .filters-bar select {
-            width: 100%;
-            padding: 10px 15px;
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            background: var(--bg-glass);
-            color: var(--text);
-            font-size: 14px;
-            outline: none;
-            cursor: pointer;
-        }
-
-        .messages-container {
-            max-height: 500px;
-            overflow-y: auto;
-        }
-
-        .message-item {
-            background: var(--bg-glass);
+        /* Logs Box */
+        .logs-box {
+            background: #0d0d12;
             border-radius: 10px;
             padding: 15px;
-            margin-bottom: 10px;
-            border-left: 3px solid var(--primary);
-        }
-
-        .message-item.system {
-            border-left-color: var(--info);
-            background: rgba(59, 130, 246, 0.1);
-        }
-
-        .message-item.command {
-            border-left-color: var(--warning);
-            background: rgba(245, 158, 11, 0.1);
-        }
-
-        .message-item.error {
-            border-left-color: var(--danger);
-            background: rgba(239, 68, 68, 0.1);
-        }
-
-        .message-header {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 8px;
-            font-size: 12px;
-            color: var(--text-muted);
-        }
-
-        .message-sender {
-            font-weight: 600;
-            color: var(--primary-light);
-        }
-
-        .message-bot {
-            background: var(--bg-card);
-            padding: 2px 8px;
-            border-radius: 5px;
-            font-size: 10px;
-        }
-
-        .message-time {
-            margin-left: auto;
-        }
-
-        .message-content {
-            font-size: 14px;
-            word-break: break-word;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: var(--text-muted);
-        }
-
-        .empty-icon {
-            font-size: 48px;
-            margin-bottom: 15px;
-            display: block;
-        }
-
-        /* ==========================================
-           ADMINISTRADORES Y VIPs
-           ========================================== */
-        .list-container {
-            max-height: 400px;
+            height: 250px;
             overflow-y: auto;
-        }
-
-        .admin-card, .vip-card {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: var(--bg-glass);
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 10px;
-            transition: all 0.2s;
-        }
-
-        .admin-card:hover, .vip-card:hover {
-            background: var(--bg-glass-hover);
-        }
-
-        .admin-info, .vip-info {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-
-        .admin-name, .vip-name {
-            font-weight: 600;
-        }
-
-        .admin-jid, .vip-jid {
+            font-family: monospace;
             font-size: 12px;
-            color: var(--text-muted);
-            font-family: 'JetBrains Mono', monospace;
-        }
-
-        .badge {
-            display: inline-block;
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-
-        .badge-admin { background: rgba(99, 102, 241, 0.2); color: var(--primary-light); }
-        .badge-mod { background: rgba(168, 85, 247, 0.2); color: #c084fc; }
-        .badge-premium { background: rgba(245, 158, 11, 0.2); color: var(--warning); }
-        .badge-basic { background: rgba(34, 197, 94, 0.2); color: var(--success); }
-        .badge-super { background: rgba(239, 68, 68, 0.2); color: var(--danger); }
-
-        .vip-details {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-top: 5px;
-        }
-
-        .vip-expiry {
-            font-size: 11px;
-            color: var(--text-muted);
-        }
-
-        /* ==========================================
-           CHAT RÁPIDO
-           ========================================== */
-        .quick-chat {
-            display: flex;
-            gap: 15px;
-            align-items: flex-end;
-        }
-
-        .quick-chat .input-group {
-            flex: 1;
-            margin-bottom: 0;
-        }
-
-        .quick-chat input {
-            width: 100%;
-            padding: 12px 15px;
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            background: var(--bg-glass);
-            color: var(--text);
-            font-size: 14px;
-            outline: none;
-        }
-
-        /* ==========================================
-           AI SECTION
-           ========================================== */
-        .ai-result {
-            background: rgba(139, 92, 246, 0.1);
-            border: 1px solid rgba(139, 92, 246, 0.3);
-            border-radius: 10px;
-            padding: 20px;
-            margin-top: 15px;
-        }
-
-        .ai-header {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 10px;
-        }
-
-        .ai-icon {
-            font-size: 24px;
-        }
-
-        .ai-suggestion-text {
-            font-size: 14px;
             line-height: 1.6;
-            margin-bottom: 15px;
         }
 
-        .ai-actions {
-            display: flex;
-            gap: 10px;
+        .log-line {
+            margin-bottom: 5px;
+            padding: 3px 0;
         }
 
-        /* ==========================================
-           BROADCAST
-           ========================================== */
-        .recipients-list {
-            max-height: 200px;
-            overflow-y: auto;
-            background: var(--bg-glass);
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 15px;
-        }
+        .log-line.error { color: var(--danger); }
+        .log-line.success { color: var(--success); }
+        .log-line.warning { color: var(--warning); }
+        .log-line.info { color: var(--info); }
+        .log-time { color: var(--text-dim); margin-right: 8px; }
 
-        .recipient-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 8px 0;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .recipient-item:last-child {
-            border-bottom: none;
-        }
-
-        .recipient-item input[type="checkbox"] {
-            width: 18px;
-            height: 18px;
-            cursor: pointer;
-        }
-
-        /* ==========================================
-           CHARTS Y ESTADÍSTICAS
-           ========================================== */
-        .chart-placeholder {
-            background: var(--bg-glass);
-            border-radius: 10px;
-            padding: 30px;
-        }
-
-        .chart-placeholder h3 {
-            margin-bottom: 20px;
-            font-size: 14px;
-            color: var(--text-muted);
-        }
-
-        .chart-bars {
-            display: flex;
-            align-items: flex-end;
-            justify-content: space-around;
-            height: 150px;
-            gap: 15px;
-        }
-
-        .chart-bar {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            height: 100%;
-        }
-
-        .bar-value {
-            width: 100%;
-            background: linear-gradient(to top, var(--primary), var(--primary-light));
-            border-radius: 5px 5px 0 0;
-            min-height: 20px;
-            display: flex;
-            align-items: flex-start;
-            justify-content: center;
-            padding-top: 5px;
-            font-size: 12px;
-            font-weight: 600;
-            color: white;
-        }
-
-        .bar-label {
-            margin-top: 10px;
-            font-size: 11px;
-            color: var(--text-muted);
-        }
-
-        /* ==========================================
-           MODALES
-           ========================================== */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal.active {
-            display: flex;
-        }
-
-        .modal-content {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            padding: 30px;
-            max-width: 500px;
-            width: 90%;
-            max-height: 80vh;
-            overflow-y: auto;
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .modal-header h3 {
-            font-family: 'Rajdhani', sans-serif;
-            font-size: 20px;
-        }
-
-        .modal-close {
-            background: none;
-            border: none;
-            color: var(--text-muted);
-            font-size: 24px;
-            cursor: pointer;
-            transition: color 0.2s;
-        }
-
-        .modal-close:hover {
-            color: var(--text);
-        }
-
-        /* ==========================================
-           NOTIFICACIONES
-           ========================================== */
+        /* Notifications */
         .notification {
             position: fixed;
-            top: 60px;
+            top: 50px;
             right: 20px;
             background: var(--bg-card);
             border: 1px solid var(--border);
@@ -1001,48 +492,16 @@
         .notification.warning { border-left: 4px solid var(--warning); }
         .notification.info { border-left: 4px solid var(--info); }
 
-        /* ==========================================
-           LOGS
-           ========================================== */
-        .logs-box {
-            background: #0d0d12;
-            border-radius: 10px;
-            padding: 15px;
-            height: 300px;
-            overflow-y: auto;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 12px;
-            line-height: 1.6;
-        }
-
-        .log-line {
-            margin-bottom: 5px;
-            padding: 3px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        .log-line.error { color: var(--danger); }
-        .log-line.success { color: var(--success); }
-        .log-line.warning { color: var(--warning); }
-        .log-line.info { color: var(--info); }
-        .log-time { color: var(--text-dim); margin-right: 10px; }
-
-        /* ==========================================
-           UTILIDADES
-           ========================================== */
+        /* Utilities */
         .text-muted { color: var(--text-muted); }
-        .text-danger { color: var(--danger); }
-        .text-success { color: var(--success); }
         .mt-2 { margin-top: 10px; }
         .mb-2 { margin-bottom: 10px; }
         .hidden { display: none !important; }
 
-        /* ==========================================
-           SCROLLBARS
-           ========================================== */
+        /* Scrollbar */
         ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
+            width: 6px;
+            height: 6px;
         }
 
         ::-webkit-scrollbar-track {
@@ -1051,7 +510,7 @@
 
         ::-webkit-scrollbar-thumb {
             background: var(--border);
-            border-radius: 4px;
+            border-radius: 3px;
         }
 
         ::-webkit-scrollbar-thumb:hover {
@@ -1060,33 +519,27 @@
     </style>
 </head>
 <body>
-    <!-- Fondo animado -->
     <div class="background"></div>
 
     <!-- Pantalla de Login -->
     <div class="login-screen" id="loginScreen">
         <div class="login-card">
-            <h2>⚡ XPE-BOT Control Panel</h2>
-            <p>Ingresa tu licencia de vendedor para acceder al panel de control</p>
+            <h1>⚡ XPE-BOT</h1>
+            <p>Panel de Control</p>
             
             <div class="input-group">
                 <label>Licencia de Vendedor</label>
                 <input type="text" id="licenseInput" placeholder="XPE-SELLER-2025" autocomplete="off">
             </div>
             
-            <button class="btn btn-primary" onclick="login()">
-                Acceder al Panel
+            <button class="btn btn-primary" id="loginBtn" onclick="login()">
+                Acceder
             </button>
             
-            <p style="margin-top: 25px; font-size: 11px; color: var(--text-muted); line-height: 1.6;">
-                ¿No tienes licencia?<br>
-                Contacta a XPE-TEAM para obtener tu licencia
-            </p>
-            
-            <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border);">
-                <p style="font-size: 10px; color: var(--text-dim);">Licencias de prueba:</p>
-                <p style="font-size: 10px; color: var(--primary); font-family: 'JetBrains Mono', monospace;">XPE-ADMIN-MASTER-2025</p>
-                <p style="font-size: 10px; color: var(--primary); font-family: 'JetBrains Mono', monospace;">XPE-SELLER-PRO-2025</p>
+            <div class="license-info">
+                <p>Licencias de prueba:</p>
+                <p class="license-demo">XPE-ADMIN-MASTER-2025</p>
+                <p class="license-demo">XPE-SELLER-PRO-2025</p>
             </div>
         </div>
     </div>
@@ -1096,7 +549,7 @@
         <!-- Title Bar -->
         <div class="titlebar">
             <div class="titlebar-title">
-                <span>⚡</span> XPE-BOT Control Panel v2.0
+                <span>⚡</span> XPE-BOT Control Panel
             </div>
             <div class="titlebar-buttons">
                 <button class="titlebar-btn" onclick="minimizeWindow()">─</button>
@@ -1105,13 +558,13 @@
             </div>
         </div>
 
-        <!-- Contenido -->
+        <!-- Contenido Principal -->
         <div class="main-container active" id="mainContent">
             <!-- Sidebar -->
             <div class="sidebar">
                 <div class="logo">
                     <h1>XPE-BOT</h1>
-                    <p>Control Panel v2.0</p>
+                    <p>Control Panel</p>
                 </div>
 
                 <div class="nav-section">
@@ -1128,29 +581,7 @@
                 </div>
 
                 <div class="nav-section">
-                    <div class="nav-section-title">Gestión</div>
-                    <div class="nav-item" data-view="admins" onclick="navigateTo('admins')">
-                        <span>👥</span> Administradores
-                    </div>
-                    <div class="nav-item" data-view="vips" onclick="navigateTo('vips')">
-                        <span>⭐</span> Usuarios VIP
-                    </div>
-                    <div class="nav-item" data-view="broadcast" onclick="navigateTo('broadcast')">
-                        <span>📢</span> Broadcast
-                    </div>
-                </div>
-
-                <div class="nav-section">
-                    <div class="nav-section-title">Análisis</div>
-                    <div class="nav-item" data-view="stats" onclick="navigateTo('stats')">
-                        <span>📈</span> Estadísticas
-                    </div>
-                    <div class="nav-item" data-view="ai" onclick="navigateTo('ai')">
-                        <span>🤖</span> IA Assistant
-                    </div>
-                </div>
-
-                <div style="margin-top: auto;">
+                    <div class="nav-section-title">Sistema</div>
                     <div class="nav-item" onclick="window.open('https://xpeteam.com', '_blank')">
                         <span>🌐</span> Website
                     </div>
@@ -1161,7 +592,7 @@
             <div class="main-content active" id="view-dashboard">
                 <div class="page-header">
                     <h1>📊 Dashboard</h1>
-                    <p>Resumen general del sistema XPE-BOT</p>
+                    <p>Resumen general del sistema</p>
                 </div>
 
                 <div class="stats-grid">
@@ -1187,12 +618,12 @@
                     <div class="card-header">
                         <h2>
                             <div class="status-indicator" id="statusIndicator"></div>
-                            🤖 Control del Bot Principal
+                            🤖 Control del Bot
                         </h2>
                     </div>
                     <div class="control-buttons">
                         <button class="btn btn-primary" id="initBotBtn" onclick="initBot()">
-                            Inicializar Bot
+                            Inicializar
                         </button>
                         <button class="btn btn-success" id="startBotBtn" onclick="startBot('main')">
                             ▶ Iniciar
@@ -1208,13 +639,13 @@
 
                 <div class="card">
                     <div class="card-header">
-                        <h2>📋 Logs en Tiempo Real</h2>
+                        <h2>📋 Logs</h2>
                         <button class="btn btn-sm btn-secondary" onclick="refreshCurrentView()">🔄 Actualizar</button>
                     </div>
                     <div class="logs-box" id="logsBox">
                         <div class="log-line info">
                             <span class="log-time">[Sistema]</span>
-                            Panel de control iniciado. Esperando activación del bot...
+                            Panel iniciado correctamente
                         </div>
                     </div>
                 </div>
@@ -1224,27 +655,23 @@
             <div class="main-content" id="view-bots">
                 <div class="page-header">
                     <h1>🤖 Gestión de Bots</h1>
-                    <p>Administra el bot principal y sub-bots</p>
+                    <p>Administra las sesiones del bot</p>
                 </div>
 
                 <div class="card">
-                    <div class="card-header">
-                        <h2>➕ Crear Sub-Bot</h2>
-                    </div>
+                    <h2>➕ Nuevo Bot</h2>
                     <p style="color: var(--text-muted); margin-bottom: 15px; font-size: 13px;">
-                        Crea un nuevo sub-bot para atender múltiples sesiones de WhatsApp simultáneamente.
+                        Genera un nuevo código QR para conectar una sesión adicional.
                     </p>
                     <button class="btn btn-primary" onclick="createSubBot()">
-                        Generar QR para Nuevo Sub-Bot
+                        Generar QR
                     </button>
                 </div>
 
-                <div class="bots-grid" id="botsList">
-                    <!-- Los bots se cargarán aquí dinámicamente -->
-                    <div class="empty-state">
-                        <span class="empty-icon">🤖</span>
-                        <p>No hay bots configurados</p>
-                        <p class="text-muted">Inicializa el bot principal para comenzar</p>
+                <div class="card">
+                    <h2>🤖 Bots Conectados</h2>
+                    <div id="botsList">
+                        <p class="text-muted">No hay bots configurados</p>
                     </div>
                 </div>
             </div>
@@ -1252,265 +679,30 @@
             <!-- Vista: Mensajes -->
             <div class="main-content" id="view-messages">
                 <div class="page-header">
-                    <h1>💬 Monitoreo de Mensajes</h1>
-                    <p>Observa todos los mensajes que llegan al bot en tiempo real</p>
+                    <h1>💬 Monitoreo</h1>
+                    <p>Mensajes en tiempo real</p>
                 </div>
 
                 <div class="card">
-                    <div class="filters-bar">
-                        <div class="input-group">
-                            <label>Tipo de Mensaje</label>
-                            <select id="filterType">
-                                <option value="all">Todos</option>
-                                <option value="text">Texto</option>
-                                <option value="image">Imágenes/Stickers</option>
-                                <option value="system">Sistema</option>
-                            </select>
-                        </div>
-                        <div class="input-group">
-                            <label>Bot</label>
-                            <select id="filterBot">
-                                <option value="all">Todos</option>
-                                <option value="main">Principal</option>
-                            </select>
-                        </div>
-                        <div class="input-group" style="flex: 2;">
-                            <label>Buscar</label>
-                            <input type="text" id="messageSearch" placeholder="Buscar mensajes...">
-                        </div>
-                        <div class="input-group" style="flex: 0;">
-                            <label>&nbsp;</label>
-                            <button class="btn btn-secondary" onclick="clearMessages()">🗑️ Limpiar</button>
-                        </div>
+                    <h2>💬 Mensajes Recibidos</h2>
+                    <div id="messagesContainer">
+                        <p class="text-muted">No hay mensajes que mostrar</p>
                     </div>
                 </div>
 
                 <div class="card">
-                    <div class="messages-container" id="messagesContainer">
-                        <div class="empty-state">
-                            <span class="empty-icon">💬</span>
-                            <p>No hay mensajes que mostrar</p>
-                            <p class="text-muted">Los mensajes aparecerán aquí cuando el bot reciba actividad</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <h2>✉️ Envío Rápido de Mensajes</h2>
-                    <div class="quick-chat">
-                        <div class="input-group">
-                            <label>Destinatario (número o JID)</label>
-                            <input type="text" id="quickJid" placeholder="54911xxxxxxxx@s.whatsapp.net">
-                        </div>
-                        <div class="input-group" style="flex: 3;">
-                            <label>Mensaje</label>
-                            <input type="text" id="messageInput" placeholder="Escribe tu mensaje...">
-                        </div>
-                        <button class="btn btn-success" id="sendMessageBtn" onclick="sendQuickMessage()">
-                            📤 Enviar
-                        </button>
-                    </div>
-                    <div id="aiSuggestion" style="display: none;"></div>
-                    <div style="margin-top: 15px;">
-                        <button class="btn btn-sm btn-secondary" id="aiGenerateBtn" onclick="generateAISuggestion()">
-                            🤖 IA: Generar Respuesta
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Vista: Administradores -->
-            <div class="main-content" id="view-admins">
-                <div class="page-header">
-                    <h1>👥 Administradores</h1>
-                    <p>Gestiona los administradores del sistema</p>
-                </div>
-
-                <div class="card">
-                    <div class="card-header">
-                        <h2>➕ Agregar Administrador</h2>
-                        <button class="btn btn-primary btn-sm" id="addAdminBtn" onclick="showAddAdminModal()">
-                            Nuevo Admin
-                        </button>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div class="list-container" id="adminsList">
-                        <div class="empty-state">
-                            <span class="empty-icon">👥</span>
-                            <p>No hay administradores</p>
-                            <button class="btn btn-primary mt-2" onclick="showAddAdminModal()">Agregar Admin</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Vista: VIPs -->
-            <div class="main-content" id="view-vips">
-                <div class="page-header">
-                    <h1>⭐ Usuarios VIP</h1>
-                    <p>Gestiona usuarios premium y sus membresías</p>
-                </div>
-
-                <div class="card">
-                    <div class="card-header">
-                        <h2>➕ Agregar Usuario VIP</h2>
-                        <button class="btn btn-primary btn-sm" id="addVipBtn" onclick="showAddVipModal()">
-                            Nuevo VIP
-                        </button>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div class="list-container" id="vipsList">
-                        <div class="empty-state">
-                            <span class="empty-icon">⭐</span>
-                            <p>No hay usuarios VIP</p>
-                            <button class="btn btn-primary mt-2" onclick="showAddVipModal()">Agregar VIP</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Vista: Broadcast -->
-            <div class="main-content" id="view-broadcast">
-                <div class="page-header">
-                    <h1>📢 Broadcast</h1>
-                    <p>Envía mensajes a múltiples destinatarios simultáneamente</p>
-                </div>
-
-                <div class="card">
-                    <h2>📋 Destinatarios</h2>
-                    <p style="color: var(--text-muted); margin-bottom: 15px; font-size: 13px;">
-                        Selecciona los usuarios VIP a los que deseas enviar el mensaje.
-                    </p>
-                    <div class="recipients-list" id="broadcastRecipients">
-                        <div class="empty-state">
-                            <span>No hay destinatarios disponibles</span>
-                        </div>
-                    </div>
-                    <div style="margin-bottom: 15px;">
-                        <button class="btn btn-sm btn-secondary" onclick="document.querySelectorAll('#broadcastRecipients input').forEach(cb => cb.checked = true)">
-                            Seleccionar Todos
-                        </button>
-                        <button class="btn btn-sm btn-secondary" onclick="document.querySelectorAll('#broadcastRecipients input').forEach(cb => cb.checked = false)">
-                            Deseleccionar Todos
-                        </button>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <h2>✉️ Mensaje</h2>
+                    <h2>✉️ Envío Rápido</h2>
                     <div class="input-group">
-                        <label>Contenido del mensaje</label>
-                        <textarea id="broadcastMessage" placeholder="Escribe tu mensaje para enviar a todos los destinatarios seleccionados..."></textarea>
+                        <label>Destinatario (número con código de país)</label>
+                        <input type="text" id="quickJid" placeholder="54911xxxxxxxx@s.whatsapp.net">
                     </div>
-                    <button class="btn btn-success" id="broadcastSendBtn" onclick="sendBroadcast()">
-                        📤 Enviar a Todos los Seleccionados
+                    <div class="input-group">
+                        <label>Mensaje</label>
+                        <input type="text" id="messageInput" placeholder="Escribe tu mensaje...">
+                    </div>
+                    <button class="btn btn-success" onclick="sendQuickMessage()">
+                        📤 Enviar
                     </button>
-                </div>
-            </div>
-
-            <!-- Vista: Estadísticas -->
-            <div class="main-content" id="view-stats">
-                <div class="page-header">
-                    <h1>📈 Estadísticas</h1>
-                    <p>Análisis de uso y rendimiento del bot</p>
-                </div>
-
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <h3>💬 Total Mensajes</h3>
-                        <div class="value" id="statTotalMessages">0</div>
-                    </div>
-                    <div class="stat-card">
-                        <h3>⚡ Total Comandos</h3>
-                        <div class="value" id="statTotalCommands">0</div>
-                    </div>
-                    <div class="stat-card">
-                        <h3>👤 Total Usuarios</h3>
-                        <div class="value" id="statTotalUsers">0</div>
-                    </div>
-                    <div class="stat-card">
-                        <h3>📅 Mensajes Hoy</h3>
-                        <div class="value" id="statDailyMessages">0</div>
-                    </div>
-                    <div class="stat-card">
-                        <h3>⏱️ Uptime Bot</h3>
-                        <div class="value info" id="statBotUptime">0h 0m</div>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <h2>📊 Actividad últimos 7 días</h2>
-                    <div id="statsChart">
-                        <div class="chart-placeholder">
-                            <h3>Mensajes por día</h3>
-                            <div class="chart-bars" id="chartBars">
-                                <!-- Gráfico generado dinámicamente -->
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Vista: IA -->
-            <div class="main-content" id="view-ai">
-                <div class="page-header">
-                    <h1>🤖 Asistente IA</h1>
-                    <p>Inteligencia artificial para asistir en la gestión del bot</p>
-                </div>
-
-                <div class="card">
-                    <h2>💡 Generador de Respuestas</h2>
-                    <p style="color: var(--text-muted); margin-bottom: 15px; font-size: 13px;">
-                        La IA analiza los mensajes recientes y genera respuestas sugeridas para tus conversaciones.
-                    </p>
-                    <button class="btn btn-primary" onclick="generateAISuggestion()">
-                        🤖 Generar Sugerencia de Respuesta
-                    </button>
-                    <div id="aiSuggestion" style="display: none; margin-top: 20px;"></div>
-                </div>
-
-                <div class="card">
-                    <h2>🔧 Configuración de IA</h2>
-                    <div class="input-group">
-                        <label>Modo de respuesta</label>
-                        <select>
-                            <option value="formal">Formal</option>
-                            <option value="friendly">Amigable</option>
-                            <option value="professional">Profesional</option>
-                        </select>
-                    </div>
-                    <div class="input-group">
-                        <label>Tono predominante</label>
-                        <select>
-                            <option value="neutral">Neutral</option>
-                            <option value="positive">Positivo</option>
-                            <option value="helpful">Servicial</option>
-                        </select>
-                    </div>
-                    <button class="btn btn-secondary">Guardar Configuración</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal para QR -->
-    <div class="modal" id="qrModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>📱 Escanear QR Code</h3>
-                <button class="modal-close" onclick="closeAllModals()">&times;</button>
-            </div>
-            <div id="qrContainer" style="text-align: center; padding: 20px;">
-                <div class="qr-placeholder">
-                    <p>Código QR generado</p>
-                    <p class="text-muted">Abre WhatsApp en tu teléfono y escanea este código</p>
-                    <div style="margin: 30px auto; width: 200px; height: 200px; background: var(--bg-glass); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
-                        <span style="font-size: 48px;">📱</span>
-                    </div>
                 </div>
             </div>
         </div>
