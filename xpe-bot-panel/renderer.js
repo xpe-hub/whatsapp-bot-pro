@@ -279,6 +279,129 @@ function minimizeWindow() { window.electronAPI.minimize(); }
 function maximizeWindow() { window.electronAPI.maximize(); }
 function closeWindow() { window.electronAPI.close(); }
 
+// ========== BOT CONTROLS ==========
+async function initBot() {
+    try {
+        showNotification('Inicializando bot...', 'info');
+        const result = await window.electronAPI.initBot();
+        if (result.success) {
+            showNotification('Bot inicializado - Espera el QR', 'success');
+        } else {
+            showNotification(result.error || 'Error', 'error');
+        }
+    } catch (error) {
+        showNotification('Error: ' + error.message, 'error');
+    }
+}
+
+async function startBot(botId) {
+    try {
+        showNotification('Iniciando conexión...', 'info');
+        const result = await window.electronAPI.startBot();
+        if (result.success) {
+            showNotification(result.message, 'success');
+        } else {
+            showNotification(result.error || 'Error', 'error');
+        }
+    } catch (error) {
+        showNotification('Error: ' + error.message, 'error');
+    }
+}
+
+async function stopBot(botId) {
+    try {
+        const result = await window.electronAPI.stopBot();
+        showNotification('Bot detenido', 'warning');
+        updateStatusIndicator('stopped');
+    } catch (error) {
+        showNotification('Error: ' + error.message, 'error');
+    }
+}
+
+async function restartBot(botId) {
+    try {
+        const result = await window.electronAPI.restartBot();
+        showNotification('Reiniciando bot...', 'info');
+    } catch (error) {
+        showNotification('Error: ' + error.message, 'error');
+    }
+}
+
+async function createSubBot() {
+    try {
+        const result = await window.electronAPI.createSubbot();
+        showNotification('QR generado para sub-bot', 'success');
+    } catch (error) {
+        showNotification('Error: ' + error.message, 'error');
+    }
+}
+
+async function sendQuickMessage() {
+    const jid = document.getElementById('quickJid')?.value;
+    const message = document.getElementById('messageInput')?.value;
+    
+    if (!jid || !message) {
+        showNotification('Completa destinatario y mensaje', 'warning');
+        return;
+    }
+    
+    try {
+        const result = await window.electronAPI.sendMessage({ jid, message });
+        if (result.success) {
+            showNotification('Mensaje enviado', 'success');
+            document.getElementById('messageInput').value = '';
+        } else {
+            showNotification(result.error || 'Error', 'error');
+        }
+    } catch (error) {
+        showNotification('Error: ' + error.message, 'error');
+    }
+}
+
+function updateStatusIndicator(status) {
+    const indicator = document.getElementById('statusIndicator');
+    if (indicator) {
+        indicator.className = 'status-indicator';
+        if (status === 'connected') indicator.classList.add('running');
+        else if (status === 'connecting') indicator.classList.add('connecting');
+        else indicator.classList.remove('running', 'connecting');
+    }
+}
+
+// Escuchar eventos del bot
+window.electronAPI.onBotQR((qr) => {
+    showNotification('Código QR recibido - Escanea con WhatsApp', 'info');
+});
+
+window.electronAPI.onBotStatus((data) => {
+    updateStatusIndicator(data.status);
+});
+
+window.electronAPI.onBotMessage((data) => {
+    const container = document.getElementById('messagesContainer');
+    if (container) {
+        const msgHtml = `
+            <div class="message-item">
+                <div class="message-header">
+                    <span class="message-sender">${data.jid}</span>
+                    <span class="message-time">${data.time}</span>
+                </div>
+                <div class="message-content">${data.text}</div>
+            </div>
+        `;
+        container.insertafterbegin', msgHtml);
+    }
+});
+
+window.electronAdjacentHTML('API.onLogUpdate((data) => {
+    const logsBox = document.getElementById('logsBox');
+    if (logsBox && data.logs) {
+        logsBox.innerHTML = data.logs.map(log => 
+            `<div class="log-line ${log.type}"><span class="log-time">[${log.time}]</span>${log.message}</div>`
+        ).join('');
+    }
+});
+
 // Funciones globales
 window.navigateTo = navigateTo;
 window.showAddAdminModal = showAddAdminModal;
@@ -291,6 +414,13 @@ window.dismissAISuggestion = dismissAISuggestion;
 window.minimizeWindow = minimizeWindow;
 window.maximizeWindow = maximizeWindow;
 window.closeWindow = closeWindow;
+window.initBot = initBot;
+window.startBot = startBot;
+window.stopBot = stopBot;
+window.restartBot = restartBot;
+window.createSubBot = createSubBot;
+window.sendQuickMessage = sendQuickMessage;
+window.refreshCurrentView = () => { loadDashboardData(); };
 
 // Prevenir menú contextual
 document.addEventListener('contextmenu', (e) => e.preventDefault());

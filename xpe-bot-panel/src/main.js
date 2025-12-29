@@ -3,18 +3,18 @@ const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
 const { machineIdSync } = require('node-machine-id');
+const botEngine = require('./bot-engine');
 
 let mainWindow;
 let isLicenseValidated = false;
 let licenseData = null;
-let botProcess = null;
-let botLogs = [];
 
 const LICENSE_DIR = path.join(app.getPath('userData'), 'licenses');
 const DATA_DIR = path.join(app.getPath('userData'), 'data');
 const APP_VERSION = '1.0.0';
 
 let db = { admins: [], vips: [], stats: { messages: 0, commands: 0, users: new Set(), dailyStats: {} } };
+let botLogs = [];
 
 function ensureDirectories() {
     if (!fs.existsSync(LICENSE_DIR)) fs.mkdirSync(LICENSE_DIR, { recursive: true });
@@ -70,6 +70,9 @@ function addLog(message, type = 'info') {
     const timestamp = new Date().toLocaleTimeString('es-ES');
     botLogs.push({ time: timestamp, message, type });
     if (botLogs.length > 100) botLogs.shift();
+    if (mainWindow) {
+        mainWindow.webContents.send('log-update', { logs: botLogs });
+    }
 }
 
 function createWindow() {
@@ -88,10 +91,26 @@ function createWindow() {
     mainWindow.webContents.on('devtools-opened', () => mainWindow.webContents.closeDevTools());
     mainWindow.once('ready-to-show', () => mainWindow.show());
     mainWindow.on('closed', () => { mainWindow = null; app.quit(); });
+
+    // Configurar callbacks del bot
+    botEngine.on('qr', (qr) => {
+        if (mainWindow) mainWindow.webContents.send('bot-qr', qr);
+    });
+    
+    botEngine.on('status', (status, message) => {
+        addLog(message, status === 'connected' ? 'success' : 'info');
+        if (mainWindow) mainWindow.webContents.send('bot-status', { status, message });
+    });
+    
+    botEngine.on('message', (msg) => {
+        const text = msg.message?.conversation || msg.message?.extendedTextMessage?.text || 'Media';
+        const jid = msg.key.remoteJid;
+        addLog(`Mensaje de ${jid}: ${text}`, 'info');
+        if (mainWindow) mainWindow.webContents.send('bot-message', { jid, text, time: new Date().toLocaleTimeString() });
+    });
 }
 
-// ========== HANDLERS ==========
-
+// Handlers IPC
 ipcMain.handle('get-hwid', async () => generateSecureHWID());
 
 ipcMain.handle('activate-license', async (event, licenseKey) => {
@@ -116,46 +135,63 @@ ipcMain.handle('check-saved-license', async () => {
 
 ipcMain.handle('get-app-version', () => APP_VERSION);
 
-// Bot Control Handlers
+// Bot Handlers
 ipcMain.handle('init-bot', async () => {
-    addLog('Inicializando sistema del bot...', 'info');
-    return { success: true, message: 'Bot inicializado correctamente' };
+    try {
+        addLog('Inicializando bot...', 'info');
+        await botEngine.start();
+        return { success: true, message: 'Bot inicializado' };
+    } catch (error) {
+        addLog(`Error: ${error.message}`, 'error');
+        return { success: false, error: error.message };
+    }
 });
 
-ipcMain.handle('start-bot', async (event, botId) => {
-    addLog(`Iniciando bot: ${botId}`, 'success');
-    return { success: true, message: `Bot ${botId} iniciado` };
+ipcMain.handle('start-bot', async () => {
+    try {
+        if (botEngine.getStatus() === 'connected') {
+            return { success: true, message: 'Bot ya conectado', status: 'connected' };
+        }
+        await botEngine.start();
+        return { success: true, message: 'Conectando...', status: 'connecting' };
+    } catch (error) {
+        return { success: false, error: error.message };
+    }
 });
 
-ipcMain.handle('stop-bot', async (event, botId) => {
-    addLog(`Deteniendo bot: ${botId}`, 'warning');
-    return { success: true, message: `Bot ${botId} detenido` };
+ipcMain.handle('stop-bot', async () => {
+    botEngine.stop();
+    addLog('Bot detenido', 'warning');
+    return { success: true, message: 'Bot detenido' };
 });
 
-ipcMain.handle('restart-bot', async (event, botId) => {
-    addLog(`Reiniciando bot: ${botId}`, 'info');
-    return { success: true, message: `Bot ${botId} reiniciado` };
+ipcMain.handle('restart-bot', async () => {
+    botEngine.stop();
+    setTimeout(async () => {
+        await botEngine.start();
+    }, 1000);
+    addLog('Reiniciando bot...', 'info');
+    return { success: true, message: 'Reiniciando...' };
 });
 
 ipcMain.handle('create-subbot', async () => {
-    addLog('Generando código QR para nuevo sub-bot...', 'info');
-    return { success: true, qrCode: 'QR_GENERATED', message: 'Código QR generado' };
+    addLog('Generando QR para sub-bot...', 'info');
+    return { success: true, message: 'QR generado' };
 });
 
 ipcMain.handle('send-message', async (event, data) => {
     const { jid, message } = data;
-    addLog(`Mensaje enviado a ${jid}: ${message}`, 'success');
-    return { success: true, message: 'Mensaje enviado correctamente' };
+    try {
+        await botEngine.sendMessage(jid, message);
+        addLog(`Enviado a ${jid}: ${message}`, 'success');
+        return { success: true };
+    } catch (error) {
+        return { success: false, error: error.message };
+    }
 });
 
-ipcMain.handle('get-logs', async () => {
-    return { logs: botLogs };
-});
-
-ipcMain.handle('clear-logs', async () => {
-    botLogs = [];
-    return { success: true };
-});
+ipcMain.handle('get-logs', async () => ({ logs: botLogs }));
+ipcMain.handle('clear-logs', async () => { botLogs = []; return { success: true }; });
 
 // Database Handlers
 ipcMain.handle('admins-get', () => db.admins);
@@ -199,12 +235,11 @@ ipcMain.handle('ai-suggest-reply', async (event, data) => {
     return { success: true, suggestion: responses[Math.floor(Math.random() * responses.length)], sentiment: 'neutral' };
 });
 
-// Window Control Handlers
 ipcMain.handle('window-minimize', () => mainWindow?.minimize());
 ipcMain.handle('window-maximize', () => { if (mainWindow?.isMaximized()) mainWindow.unmaximize(); else mainWindow?.maximize(); });
 ipcMain.handle('window-close', () => mainWindow?.close());
 
-app.whenReady().then(() => { ensureDirectories(); loadDatabase(); createWindow(); });
+app.whenReady().then(() => { ensureDirectories(); loadDatabase(); createWindow(); addLog('Panel iniciado', 'info'); });
 app.on('window-all-closed', () => { if (process.platform !== 'darwin') app.quit(); });
 app.on('activate', () => { if (BrowserWindow.getAllWindows().length === 0) createWindow(); });
 setInterval(saveDatabase, 60000);
