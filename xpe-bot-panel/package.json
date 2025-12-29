@@ -5,6 +5,7 @@
   "main": "src/main.js",
   "scripts": {
     "start": "electron .",
+    "install:all": "npm install && npm install electron@27.0.0 @whiskeysockets/baileys pino",
     "build": "electron-builder --win --x64"
   },
   "author": "XPE-TEAM",
@@ -14,7 +15,9 @@
     "electron-builder": "^24.9.1"
   },
   "dependencies": {
-    "node-machine-id": "^1.1.12"
+    "node-machine-id": "^1.1.12",
+    "@whiskeysockets/baileys": "^6.5.0",
+    "pino": "^8.16.0"
   },
   "build": {
     "appId": "com.xpeteam.xpebotpanel",
