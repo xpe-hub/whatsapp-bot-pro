@@ -1,6 +1,6 @@
 {
   "name": "xpe-bot-panel",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Panel de control para XPE-BOT - Diseño K-VRC Inspired",
   "main": "src/main.js",
   "scripts": {
