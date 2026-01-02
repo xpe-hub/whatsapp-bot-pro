@@ -1,0 +1,74 @@
+name: Build and Release XPE Bot Panel
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'xpe-bot-panel/**'
+  release:
+    types: [created]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: xpe-bot-panel/package-lock.json
+
+      - name: Install dependencies
+        working-directory: ./xpe-bot-panel
+        run: npm ci
+
+      - name: Build Electron application
+        working-directory: ./xpe-bot-panel
+        run: npm run build
+        env:
+          ELECTRON_BUILDER_WIN_CERTIFICATE_FILE: ''
+          ELECTRON_BUILDER_WIN_CERTIFICATE_PASSWORD: ''
+
+      - name: Upload Windows executable
+        uses: actions/upload-artifact@v4
+        with:
+          name: xpe-bot-panel.exe
+          path: xpe-bot-panel/dist/
+          retention-days: 5
+
+  create-release:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.event_name == 'release'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download built artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: xpe-bot-panel.exe
+          path: panel-build
+
+      - name: Create bot ZIP package
+        run: |
+          cd xpe-bot
+          # Create clean package without node_modules, .git, and .md files
+          cd ..
+          zip -r bot-package.zip xpe-bot -x "*/node_modules/*" "*/.git/*" "*.md"
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            panel-build/*.exe
+            bot-package.zip
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
