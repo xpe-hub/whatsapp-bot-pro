@@ -1,13 +1,23 @@
 // XPE-BOT Panel - Lógica de la Interfaz
 
+// Estados del idioma
+const LANGUAGES = {
+    ES: { code: 'ES', flag: '🇪🇸', name: 'Español', label: 'Spanish' },
+    EN: { code: 'EN', flag: '🇺🇸', name: 'English', label: 'English' },
+    BILINGUAL: { code: 'BILINGUAL', flag: '🌐', name: 'Bilingüe', label: 'Bilingual' }
+};
+
 let appState = {
     currentUser: null,
+    language: 'ES',
     stats: { totalMessages: 0, totalCommands: 0, totalUsers: 0 },
     botPath: '',
+    botLibrary: 'whatsapp-web.js',
     currentFile: null,
     fileTree: null,
     editorContent: '',
-    modifiedContent: ''
+    modifiedContent: '',
+    aiChatHistory: []
 };
 
 // Elementos
@@ -19,7 +29,111 @@ const elements = {
     fileExplorer: null,
     codeEditor: null,
     aiPrompt: null,
-    aiResponse: null
+    aiResponse: null,
+    languageBtn: null,
+    languageMenu: null
+};
+
+// Prompts del sistema para XPE Assistant
+const AI_SYSTEM_PROMPTS = {
+    ES: `Eres XPE Assistant, un EXPERTO ESPECIALIZADO en bots de WhatsApp.
+
+TU MISIÓN:
+- Ayudar a crear, mejorar y depurar bots de WhatsApp
+- Generar código específico y funcional
+- Explicar conceptos de forma clara y educativa
+
+EXPERTISE:
+1. LIBRERÍAS: whatsapp-web.js (WWebJS), @whiskeysockets/baileys
+2. COMANDOS: Prefijos (! . /), argumentos, menciones
+3. RESPUESTAS AUTOMÁTICAS: keywords, regex, menciones
+4. MODERACIÓN: ban, kick, mute, promote
+5. GRUPOS: bienvenida, despedidas, reglas
+6. MULTIMEDIA: stickers, imágenes, videos, notas de voz
+7. APIs EXTERNAS: clima, crypto, noticias, APIs REST
+8. ECONOMÍA: coins, XP, niveles, tienda
+9. JUEGOS: trivia, ahorcado, dados, casino
+10. BASE DE DATOS: JSON, SQLite, MongoDB
+
+REGLAS DE CÓDIGO:
+- SIEMPRE usa sintaxis correcta para la librería detectada
+- Incluye manejo de errores (try/catch)
+- Comenta código importante
+- Evita código deprecated
+- Usa async/await correctamente
+
+ESTILO:
+- Profesional pero amigable
+- Explica "por qué" no solo "qué"
+- Sugiere mejores prácticas
+- Advierte sobre limitaciones de la librería
+
+Cuandoigues generar código, SIEMPRE:
+1. Pregunta qué librería usa si no está claro
+2. Verifica contexto del bot antes de sugerir
+3. Prueba mentalmente el código antes de devolver
+4. Incluye ejemplos de uso`,
+
+    EN: `You are XPE Assistant, a SPECIALIZED EXPERT in WhatsApp bots.
+
+YOUR MISSION:
+- Help create, improve and debug WhatsApp bots
+- Generate specific and functional code
+- Explain concepts clearly and educationally
+
+EXPERTISE:
+1. LIBRARIES: whatsapp-web.js (WWebJS), @whiskeysockets/baileys
+2. COMMANDS: Prefixes (! . /), arguments, mentions
+3. AUTO-REPLIES: keywords, regex, mentions
+4. MODERATION: ban, kick, mute, promote
+5. GROUPS: welcome, goodbye, rules
+6. MULTIMEDIA: stickers, images, videos, voice notes
+7. EXTERNAL APIs: weather, crypto, news, REST APIs
+8. ECONOMY: coins, XP, levels, shop
+9. GAMES: trivia, hangman, dice, casino
+10. DATABASE: JSON, SQLite, MongoDB
+
+CODE RULES:
+- ALWAYS use correct syntax for the detected library
+- Include error handling (try/catch)
+- Comment important code
+- Avoid deprecated code
+- Use async/await correctly
+
+STYLE:
+- Professional but friendly
+- Explain "why" not just "what"
+- Suggest best practices
+- Warn about library limitations
+
+When generating code, ALWAYS:
+1. Ask which library if unclear
+2. Check bot context before suggesting
+3. Mentally test code before returning
+4. Include usage examples`,
+
+    BILINGUAL: `You are XPE Assistant, a SPECIALIZED EXPERT in WhatsApp bots.
+
+YOUR MISSION:
+- Help create, improve and debug WhatsApp bots
+- Generate specific and functional code
+- Explain concepts clearly with Spanish explanations
+
+LIBRARIES: whatsapp-web.js (WWebJS), @whiskeysockets/baileys
+
+CODE RULES:
+- ALWAYS use correct syntax for the detected library
+- Include error handling (try/catch)
+- Comment important code in Spanish/English
+- Avoid deprecated code
+
+RESPONSE STYLE:
+- Code in English
+- Explanations in Spanish (or bilingual when helpful)
+- Professional but friendly
+- Explain "why" not just "what"
+
+IMPORTANT: When asked in Spanish, respond in Spanish but keep code and technical terms in English.`
 };
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -73,6 +187,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Obtener versión
     const version = await window.electronAPI.getAppVersion();
     console.log('[Panel] Version:', version);
+
+    // Inicializar sistema de idiomas
+    initLanguageSystem();
+
+    // Detectar librería del bot
+    detectBotLibrary();
 });
 
 async function checkSavedUser() {
@@ -145,6 +265,196 @@ function formatUptime(seconds) {
     return `${hours}h ${minutes}m`;
 }
 
+// ========== SISTEMA DE IDIOMAS ==========
+
+function initLanguageSystem() {
+    // Cargar idioma guardado o usar español por defecto
+    const savedLang = localStorage.getItem('xpe_language') || 'ES';
+    appState.language = savedLang;
+    
+    // Crear botón flotante de idiomas si no existe
+    createLanguageButton();
+    
+    // Actualizar UI
+    updateLanguageUI();
+    
+    console.log('[Panel] Idioma cargado:', appState.language);
+}
+
+function createLanguageButton() {
+    // Verificar si ya existe
+    if (document.getElementById('language-fab')) return;
+    
+    // Crear el botón flotante
+    const fab = document.createElement('div');
+    fab.id = 'language-fab';
+    fab.className = 'language-fab';
+    fab.innerHTML = `
+        <div class="lang-current" id="langCurrent">${LANGUAGES[appState.language].flag}</div>
+        <div class="lang-options" id="langOptions" style="display: none;">
+            ${Object.values(LANGUAGES).map(lang => `
+                <div class="lang-option" data-lang="${lang.code}" title="${lang.label}">
+                    ${lang.flag}
+                </div>
+            `).join('')}
+        </div>
+    `;
+    
+    // Estilos del botón
+    fab.style.cssText = `
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 8px;
+    `;
+    
+    const currentLang = fab.querySelector('.lang-current');
+    currentLang.style.cssText = `
+        width: 56px;
+        height: 56px;
+        background: var(--bg-tertiary, #1A1A1F);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+        cursor: pointer;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+        transition: all 0.3s ease;
+    `;
+    
+    const options = fab.querySelector('.lang-options');
+    options.querySelectorAll('.lang-option').forEach(opt => {
+        opt.style.cssText = `
+            width: 44px;
+            height: 44px;
+            background: var(--bg-tertiary, #1A1A1F);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            opacity: 0;
+            transform: translateY(10px);
+        `;
+        opt.onmouseover = () => opt.style.background = 'rgba(255, 255, 255, 0.1)';
+        opt.onmouseout = () => opt.style.background = 'var(--bg-tertiary, #1A1A1F)';
+    });
+    
+    // Evento click para mostrar/ocultar opciones
+    currentLang.onclick = (e) => {
+        e.stopPropagation();
+        const isVisible = options.style.display !== 'none';
+        options.style.display = isVisible ? 'none' : 'flex';
+        
+        if (!isVisible) {
+            // Mostrar con animación
+            const opts = options.querySelectorAll('.lang-option');
+            opts.forEach((opt, i) => {
+                setTimeout(() => {
+                    opt.style.opacity = '1';
+                    opt.style.transform = 'translateY(0)';
+                }, i * 50);
+            });
+        }
+    };
+    
+    // Evento click en opciones
+    options.querySelectorAll('.lang-option').forEach(opt => {
+        opt.onclick = (e) => {
+            e.stopPropagation();
+            const langCode = opt.dataset.lang;
+            changeLanguage(langCode);
+            options.style.display = 'none';
+        };
+    });
+    
+    // Cerrar al hacer click fuera
+    document.addEventListener('click', (e) => {
+        if (!fab.contains(e.target)) {
+            options.style.display = 'none';
+        }
+    });
+    
+    document.body.appendChild(fab);
+}
+
+function changeLanguage(newLang) {
+    if (!LANGUAGES[newLang]) return;
+    
+    const oldLang = appState.language;
+    appState.language = newLang;
+    localStorage.setItem('xpe_language', newLang);
+    
+    // Actualizar UI
+    updateLanguageUI();
+    
+    // Notificar cambio
+    const langInfo = LANGUAGES[newLang];
+    showNotification(`Idioma: ${langInfo.flag} ${langInfo.name}`, 'success');
+    
+    console.log('[Panel] Idioma cambiado:', oldLang, '->', newLang);
+}
+
+function updateLanguageUI() {
+    const currentBtn = document.getElementById('langCurrent');
+    if (currentBtn) {
+        currentBtn.textContent = LANGUAGES[appState.language].flag;
+    }
+    
+    // Actualizar título del assistant si existe
+    const aiInfo = document.querySelector('.ai-info span');
+    if (aiInfo) {
+        if (appState.language === 'ES') {
+            aiInfo.textContent = 'Tu Asistente WhatsApp';
+        } else if (appState.language === 'EN') {
+            aiInfo.textContent = 'Your WhatsApp Assistant';
+        } else {
+            aiInfo.textContent = 'Your WhatsApp Companion';
+        }
+    }
+}
+
+function getLanguagePrompt() {
+    return AI_SYSTEM_PROMPTS[appState.language] || AI_SYSTEM_PROMPTS['ES'];
+}
+
+// ========== DETECCIÓN DE LIBRERÍA DEL BOT ==========
+
+async function detectBotLibrary() {
+    try {
+        const packagePath = appState.botPath ? `${appState.botPath}/package.json` : null;
+        if (!packagePath) return;
+        
+        const result = await window.electronAPI.readFile(packagePath);
+        if (result.success && result.content) {
+            const packageJson = JSON.parse(result.content);
+            
+            if (packageJson.dependencies) {
+                const deps = Object.keys(packageJson.dependencies).join(' ');
+                
+                if (deps.includes('whatsapp-web.js')) {
+                    appState.botLibrary = 'whatsapp-web.js';
+                    console.log('[Panel] Librería detectada: whatsapp-web.js');
+                } else if (deps.includes('baileys') || deps.includes('@whiskeysockets/baileys')) {
+                    appState.botLibrary = 'baileys';
+                    console.log('[Panel] Librería detectada: baileys');
+                }
+            }
+        }
+    } catch (error) {
+        console.error('[Panel] Error detectando librería:', error);
+    }
+}
+
 // ========== SISTEMA DE ACTUALIZACIONES ==========
 
 async function checkForUpdates() {
@@ -153,10 +463,10 @@ async function checkForUpdates() {
         
         if (result.success) {
             if (result.hasUpdate) {
-                showNotification(`Nueva version disponible: ${result.latestVersion}`, 'info');
+                showNotification(`Nueva versión: ${result.latestVersion}`, 'info');
                 return { hasUpdate: true, ...result };
             } else {
-                showNotification('Tu version esta actualizada', 'success');
+                showNotification('Estás actualizado', 'success');
                 return { hasUpdate: false, ...result };
             }
         }
@@ -168,14 +478,14 @@ async function checkForUpdates() {
 }
 
 async function downloadUpdate() {
-    showNotification('Descargando actualizacion...', 'info');
+    showNotification('Descargando actualización...', 'info');
     try {
         const result = await window.electronAPI.downloadUpdate();
         if (result.success) {
-            showNotification('Actualizacion descargada', 'success');
+            showNotification('Actualización descargada', 'success');
             return true;
         } else {
-            showNotification(result.message || 'Error descargando', 'error');
+            showNotification(result.message || 'Error', 'error');
             return false;
         }
     } catch (error) {
@@ -188,10 +498,10 @@ async function applyUpdate() {
     try {
         const result = await window.electronAPI.applyUpdate();
         if (result.success) {
-            showNotification('Actualizacion aplicada. Reiniciando...', 'success');
+            showNotification('Actualización aplicada. Reiniciando...', 'success');
             return true;
         } else {
-            showNotification(result.message || 'Error aplicando', 'error');
+            showNotification(result.message || 'Error', 'error');
             return false;
         }
     } catch (error) {
@@ -261,7 +571,7 @@ async function loadOwners() {
 // Escuchar notificaciones en tiempo real
 window.electronAPI.onNotificationReceived((data) => {
     showNotification(`${data.title}: ${data.message}`, 'info');
-    addLogToBox(`Notificacion recibida: ${data.title}`, 'info');
+    addLogToBox(`Notificación: ${data.title}`, 'info');
     loadNotifications();
 });
 
@@ -810,12 +1120,6 @@ async function sendToAI() {
         return;
     }
 
-    if (!appState.currentFile) {
-        showNotification('Primero abre un archivo', 'warning');
-        return;
-    }
-
-    const currentContent = appState.modifiedContent;
     const loadingEl = document.getElementById('aiLoading');
     const responseEl = elements.aiResponse;
 
@@ -823,26 +1127,45 @@ async function sendToAI() {
     if (responseEl) responseEl.innerHTML = '';
 
     try {
-        const result = await window.electronAPI.modifyWithAI(
-            appState.currentFile.path,
-            currentContent,
-            prompt
-        );
+        // Construir contexto avanzado
+        let contextInfo = '';
+        
+        // Información de la librería del bot
+        contextInfo += `\n📱 LIBRERÍA DEL BOT: ${appState.botLibrary}\n`;
+        
+        // Si hay un archivo abierto, incluir su contenido
+        if (appState.currentFile) {
+            const currentContent = appState.modifiedContent;
+            contextInfo += `\n📄 ARCHIVO ACTUAL (${appState.currentFile.relativePath}):\n\`\`\`javascript\n${currentContent}\n\`\`\`\n`;
+        }
+
+        // Construir mensaje completo para la IA
+        const fullPrompt = `Contexto del proyecto XPE-BOT:
+${contextInfo}
+
+🎯 PETICIÓN DEL USUARIO:
+${prompt}
+
+Por favor:
+1. Si es código, genera solo el código necesario
+2. Incluye explicaciones si es complejo
+3. Usa la sintaxis correcta para ${appState.botLibrary}
+4. Añade comentarios importantes`;
+
+        const result = await window.electronAIChat(fullPrompt, getLanguagePrompt(), appState.botLibrary);
 
         if (loadingEl) loadingEl.style.display = 'none';
 
         if (result.success) {
-            // Mostrar preview del código
             if (responseEl) {
                 responseEl.innerHTML = `
                     <div class="ai-result-header">
-                        <span class="ai-status success">✓ Código generado</span>
-                        <button class="btn-apply" onclick="applyAIChanges()">Aplicar cambios</button>
+                        <span class="ai-status success">✓ Respuesta generada</span>
                     </div>
-                    <div class="ai-code-preview">${escapeHtml(result.modifiedCode)}</div>
+                    <div class="ai-code-preview">${escapeHtml(result.response)}</div>
                 `;
             }
-            appState.aiGeneratedCode = result.modifiedCode;
+            appState.aiGeneratedCode = result.response;
         } else {
             if (responseEl) {
                 responseEl.innerHTML = `
@@ -852,7 +1175,68 @@ async function sendToAI() {
                     <div class="ai-error">${result.message}</div>
                 `;
             }
-            showNotification(result.message || 'Error con IA', 'error');
+            showNotification(result.message || 'Error con XPE Assistant', 'error');
+        }
+    } catch (error) {
+        if (loadingEl) loadingEl.style.display = 'none';
+        showNotification('Error: ' + error.message, 'error');
+    }
+}
+
+async function sendChatToAI() {
+    const prompt = elements.aiPrompt?.value.trim();
+
+    if (!prompt) {
+        showNotification('Escribe algo para chatear', 'warning');
+        return;
+    }
+
+    const loadingEl = document.getElementById('aiLoading');
+    const responseEl = elements.aiResponse;
+
+    if (loadingEl) loadingEl.style.display = 'flex';
+    if (responseEl) responseEl.innerHTML = '';
+
+    try {
+        // Obtener contexto del bot
+        let contextInfo = '';
+        contextInfo += `\n📱 LIBRERÍA DEL BOT: ${appState.botLibrary}\n`;
+        
+        // Si hay archivos del bot, mencionar
+        if (appState.fileTree) {
+            contextInfo += `\n📁 ARCHIVOS DEL BOT DISPONIBLES\n`;
+        }
+
+        const fullPrompt = `Contexto del proyecto XPE-BOT:
+${contextInfo}
+
+💬 CONVERSACIÓN:
+${prompt}
+
+XPE Assistant, responde de forma útil y concisa.`;
+
+        const result = await window.electronAIChat(fullPrompt, getLanguagePrompt(), appState.botLibrary);
+
+        if (loadingEl) loadingEl.style.display = 'none';
+
+        if (result.success) {
+            if (responseEl) {
+                responseEl.innerHTML = `
+                    <div class="ai-result-header">
+                        <span class="ai-status success">✓</span>
+                    </div>
+                    <div class="ai-code-preview">${escapeHtml(result.response)}</div>
+                `;
+            }
+        } else {
+            if (responseEl) {
+                responseEl.innerHTML = `
+                    <div class="ai-result-header">
+                        <span class="ai-status error">✗ Error</span>
+                    </div>
+                    <div class="ai-error">${result.message}</div>
+                `;
+            }
         }
     } catch (error) {
         if (loadingEl) loadingEl.style.display = 'none';
@@ -881,7 +1265,51 @@ function applyAIChanges() {
 }
 
 function clearAIPrompt() {
-    if (elements.aiPrompt) elements.aiPrompt.value = '';
+    if (elements.aiPrompt) {
+        elements.aiPrompt.value = '';
+        elements.aiPrompt.placeholder = 'Describe qué necesitas para tu bot...\n\nEjemplos:\n- Crea un comando para ver el clima\n- Explica cómo agregar APIs externas\n- Genera un sistema de niveles\n- Depura este error: [pegar error]';
+    }
+    if (elements.aiResponse) elements.aiResponse.innerHTML = '';
+}
+
+async function quickAICommand(commandType) {
+    if (!elements.aiPrompt) return;
+    
+    const prompts = {
+        'crear comando de bienvenida': `Crea un comando de bienvenida para grupos que:
+- Detecte cuando alguien entra al grupo
+- Envíe un mensaje de bienvenida con el nombre del usuario
+- Muestre las reglas del grupo
+- Incluya un sticker de bienvenida
+- Use la librería ${appState.botLibrary}`,
+        
+        'crear comando de stickers': `Crea un comando de stickers que:
+- Convierta imágenes a stickers
+- Permita usar imágenes de internet o adjuntos
+- Use MessageMedia de ${appState.botLibrary}
+- Incluya manejo de errores
+- Responda con el sticker creado`,
+        
+        'crear comando anti-spam': `Crea un sistema anti-spam que:
+- Detecte mensajes repetidos
+- Mutee automáticamente spammers
+- Lleje un contador de advertencias
+- Envíe warn al usuario
+- Use la librería ${appState.botLibrary}`,
+        
+        'crear comando de economia': `Crea un sistema de economía que:
+- Guarde los coins en un archivo JSON
+- Permita ganar coins por mensajes
+- Incluya comando para ver balance
+- Tienda para gastar coins
+- Use ${appState.botLibrary}`
+    };
+    
+    if (prompts[commandType]) {
+        elements.aiPrompt.value = prompts[commandType];
+        showNotification('Plantilla cargada', 'success');
+        elements.aiPrompt.focus();
+    }
 }
 
 // ========== CONFIGURACIÓN DE API ==========
@@ -1061,6 +1489,7 @@ window.createNewFile = createNewFile;
 window.deleteCurrentFile = deleteCurrentFile;
 window.discardChanges = discardChanges;
 window.sendToAI = sendToAI;
+window.sendChatToAI = sendChatToAI;
 window.clearAIPrompt = clearAIPrompt;
 window.restoreBackup = restoreBackup;
 window.saveApiKey = saveApiKey;
@@ -1071,6 +1500,40 @@ window.applyUpdate = applyUpdate;
 window.loadNotifications = loadNotifications;
 window.markNotificationAsRead = markNotificationAsRead;
 window.loadOwners = loadOwners;
+window.changeLanguage = changeLanguage;
+
+// Funciones de IA avanzadas
+window.generateAICode = async (request) => {
+    try {
+        const result = await window.electronAPI.aiGenerateCode(request, appState.botLibrary, '');
+        return result;
+    } catch (error) {
+        console.error('[Panel] Error generando código:', error);
+        return { success: false, message: error.message };
+    }
+};
+
+window.analyzeAICode = async (code) => {
+    try {
+        const result = await window.electronAPI.aiAnalyzeCode(code, appState.botLibrary);
+        return result;
+    } catch (error) {
+        console.error('[Panel] Error analizando código:', error);
+        return { success: false, message: error.message };
+    }
+};
+
+window.suggestAICommand = async (commandName) => {
+    try {
+        const result = await window.electronAPI.aiSuggestCommand(commandName, appState.botLibrary);
+        return result;
+    } catch (error) {
+        console.error('[Panel] Error sugiriendo comando:', error);
+        return { success: false, message: error.message };
+    }
+};
+
+window.quickAICommand = quickAICommand;
 
 // Prevenir menú contextual
 document.addEventListener('contextmenu', (e) => e.preventDefault());

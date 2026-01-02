@@ -1886,15 +1886,32 @@
                                     </div>
                                     <div class="ai-info">
                                         <h3>XPE Assistant</h3>
-                                        <span>Tu AI Companion</span>
+                                        <span>Tu Asistente WhatsApp</span>
                                     </div>
                                 </div>
+                                <div class="ai-quick-actions" style="display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap;">
+                                    <button class="btn btn-secondary" onclick="quickAICommand('crear comando de bienvenida')" style="padding: 8px 12px; font-size: 11px;">
+                                        👋 Bienvenida
+                                    </button>
+                                    <button class="btn btn-secondary" onclick="quickAICommand('crear comando de stickers')" style="padding: 8px 12px; font-size: 11px;">
+                                        🖼️ Stickers
+                                    </button>
+                                    <button class="btn btn-secondary" onclick="quickAICommand('crear comando anti-spam')" style="padding: 8px 12px; font-size: 11px;">
+                                        🛡️ Anti-Spam
+                                    </button>
+                                    <button class="btn btn-secondary" onclick="quickAICommand('crear comando de economia')" style="padding: 8px 12px; font-size: 11px;">
+                                        💰 Economia
+                                    </button>
+                                </div>
                                 <div class="ai-prompt-area">
-                                    <textarea id="aiPrompt" placeholder="Describe qué necesitas..."></textarea>
+                                    <textarea id="aiPrompt" placeholder="Describe qué necesitas para tu bot...&#10;&#10;Ejemplos:&#10;- Crea un comando para ver el clima&#10;- Explica cómo agregar APIs externas&#10;- Genera un sistema de niveles&#10;- Depura este error: [pegar error]"></textarea>
                                     <div id="aiResponse"></div>
                                     <div style="display: flex; gap: 10px;">
                                         <button class="btn btn-primary" onclick="sendToAI()" style="flex: 1;">
-                                            ✨ Generar
+                                            ✨ Generar Código
+                                        </button>
+                                        <button class="btn btn-secondary" onclick="sendChatToAI()" style="flex: 1;">
+                                            💬 Chatear
                                         </button>
                                         <button class="btn btn-secondary" onclick="clearAIPrompt()">
                                             🧹

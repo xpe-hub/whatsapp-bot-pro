@@ -818,6 +818,240 @@ Instrucción del usuario: "${instruction}"`;
   }
 });
 
+// ========== IPC HANDLERS - XPE ASSISTANT (NUEVOS) ==========
+
+ipcMain.handle('ai:chat', async (event, userPrompt, systemPrompt, library) => {
+  const config = loadConfig();
+
+  if (!config.openaiKey) {
+    return { success: false, message: 'No hay clave de API de OpenAI configurada' };
+  }
+
+  try {
+    addLog('info', 'XPE Assistant procesando...');
+
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${config.openaiKey}`
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o',
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt }
+        ],
+        temperature: 0.7,
+        max_tokens: 4000
+      })
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error?.message || 'Error en la API de OpenAI');
+    }
+
+    const data = await response.json();
+    const aiResponse = data.choices[0].message.content;
+
+    addLog('success', 'XPE Assistant respondió');
+    return { success: true, response: aiResponse };
+
+  } catch (error) {
+    addLog('error', `Error con XPE Assistant: ${error.message}`);
+    return { success: false, message: error.message };
+  }
+});
+
+ipcMain.handle('ai:generate-code', async (event, request, library, context) => {
+  const config = loadConfig();
+
+  if (!config.openaiKey) {
+    return { success: false, message: 'No hay clave de API de OpenAI configurada' };
+  }
+
+  try {
+    addLog('info', 'XPE Assistant generando código...');
+
+    const advancedPrompt = `Eres XPE Assistant, un EXPERTO en bots de WhatsApp especializado en ${library}.
+
+CONTEXTO DEL PROYECTO:
+${context || 'Sin contexto adicional'}
+
+PETICIÓN DEL USUARIO:
+${request}
+
+REGLAS ESTRICTAS:
+1. Genera código COMPLETO y FUNCIONAL
+2. Usa sintaxis correcta para ${library}
+3. Incluye manejo de errores (try/catch)
+4. Añade comentarios en español
+5. Si es código nuevo, incluye todo (imports, exports, etc.)
+6. Usa async/await correctamente
+7. Evita código deprecated
+8. Sugiere cómo integrar el código
+
+FORMATO DE RESPUESTA:
+- Si hay código, usa bloques \`\`\`javascript ... \`\`\`
+- Explica brevemente qué hace el código
+- Sugiere dónde colocar el código`;
+
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${config.openaiKey}`
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o',
+        messages: [
+          { role: 'system', content: advancedPrompt },
+          { role: 'user', content: request }
+        ],
+        temperature: 0.5,
+        max_tokens: 6000
+      })
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error?.message || 'Error en la API de OpenAI');
+    }
+
+    const data = await response.json();
+    const generatedCode = data.choices[0].message.content;
+
+    addLog('success', 'Código generado por XPE Assistant');
+    return { success: true, response: generatedCode };
+
+  } catch (error) {
+    addLog('error', `Error generando código: ${error.message}`);
+    return { success: false, message: error.message };
+  }
+});
+
+ipcMain.handle('ai:analyze-code', async (event, code, library) => {
+  const config = loadConfig();
+
+  if (!config.openaiKey) {
+    return { success: false, message: 'No hay clave de API de OpenAI configurada' };
+  }
+
+  try {
+    addLog('info', 'XPE Assistant analizando código...');
+
+    const analyzePrompt = `Analiza el siguiente código de un bot de WhatsApp hecho con ${library}.
+
+CÓDIGO A ANALIZAR:
+\`\`\`javascript
+${code}
+\`\`\`
+
+PROPORCIONA:
+1. 📊 RESUMEN: ¿Qué hace este código?
+2. ✅ FORTALEZAS: Puntos fuertes del código
+3. ⚠️ PROBLEMAS: Errores o mejoras posibles
+4. 🔧 OPTIMIZACIONES: Sugerencias específicas
+5. 💡 MEJORAS: Ideas para expandir funcionalidad
+6. 🔒 SEGURIDAD: Revisa vulnerabilidades
+
+Sé específico y proporciona ejemplos cuando sea posible.`;
+
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${config.openaiKey}`
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o',
+        messages: [
+          { role: 'system', content: 'Eres un experto en análisis de código de bots de WhatsApp.' },
+          { role: 'user', content: analyzePrompt }
+        ],
+        temperature: 0.4,
+        max_tokens: 4000
+      })
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error?.message || 'Error en la API de OpenAI');
+    }
+
+    const data = await response.json();
+    const analysis = data.choices[0].message.content;
+
+    addLog('success', 'Análisis completado');
+    return { success: true, response: analysis };
+
+  } catch (error) {
+    addLog('error', `Error analizando código: ${error.message}`);
+    return { success: false, message: error.message };
+  }
+});
+
+ipcMain.handle('ai:suggest-command', async (event, commandName, library) => {
+  const config = loadConfig();
+
+  if (!config.openaiKey) {
+    return { success: false, message: 'No hay clave de API de OpenAI configurada' };
+  }
+
+  try {
+    addLog('info', `XPE Assistant sugiriendo comando: ${commandName}`);
+
+    const suggestPrompt = `Crea un comando completo para un bot de WhatsApp usando ${library}.
+
+NOMBRE DEL COMANDO: ${commandName}
+
+INCLUYE:
+1. ✅ Código completo del comando
+2. 📝 Descripción de qué hace
+3. 🔧 Uso: cómo se invoca (ej: !${commandName})
+4. 📋 Args requeridos/opcionales
+5. ⚡ Lógica del comando
+6. 💬 Respuestas de ejemplo
+7. 🔒 Permisos necesarios (si aplica)
+8. 📦 Dependencias externas (si aplica)
+
+Genera TODO el código necesario, listo para copiar y pegar.`;
+
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${config.openaiKey}`
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o',
+        messages: [
+          { role: 'system', content: 'Eres un experto en crear comandos para bots de WhatsApp.' },
+          { role: 'user', content: suggestPrompt }
+        ],
+        temperature: 0.5,
+        max_tokens: 4000
+      })
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error?.message || 'Error en la API de OpenAI');
+    }
+
+    const data = await response.json();
+    const suggestion = data.choices[0].message.content;
+
+    addLog('success', `Sugerencia generada para: ${commandName}`);
+    return { success: true, response: suggestion };
+
+  } catch (error) {
+    addLog('error', `Error sugiriendo comando: ${error.message}`);
+    return { success: false, message: error.message };
+  }
+});
+
 // ========== IPC HANDLERS - SISTEMA ==========
 
 ipcMain.handle('system:info', async () => {

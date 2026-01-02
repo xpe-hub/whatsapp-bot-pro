@@ -38,6 +38,10 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
     // IA
     modifyWithAI: (filePath, currentContent, instruction) => ipcRenderer.invoke('bot:ai-modify', filePath, currentContent, instruction),
+    aiChat: (prompt, systemPrompt, library) => ipcRenderer.invoke('ai:chat', prompt, systemPrompt, library),
+    aiGenerateCode: (request, library, context) => ipcRenderer.invoke('ai:generate-code', request, library, context),
+    aiAnalyzeCode: (code, library) => ipcRenderer.invoke('ai:analyze-code', code, library),
+    aiSuggestCommand: (commandName, library) => ipcRenderer.invoke('ai:suggest-command', commandName, library),
     saveApiKey: (apiKey) => ipcRenderer.invoke('bot:save-api-key', apiKey),
     loadApiKey: () => ipcRenderer.invoke('bot:load-api-key'),
 
