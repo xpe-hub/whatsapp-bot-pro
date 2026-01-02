@@ -1,0 +1,106 @@
+[
+  {
+    "query": "K-VRC robot from Love Death Robots, orange robot character, cute robot design",
+    "image_info": {
+      "url": "https://mir-s3-cdn-cf.behance.net/project_modules/max_1200_webp/460177199048897.664b754e6017c.png",
+      "img_format": "WEBP",
+      "mode": "RGB",
+      "file_size": 97436,
+      "width": 1200,
+      "height": 1200,
+      "total_pixels": 1440000,
+      "basic_score": 0.8881775672237778,
+      "file_name": "k-vrc-orange-robot-love-death-robots-character-design.jpg"
+    },
+    "llm_score": {
+      "success": true,
+      "relevance_score": 100.0,
+      "clarity_score": 95.0,
+      "watermark_score": 100.0,
+      "overall_score": 98.0,
+      "explanation": "The image is a perfect match for the search query, depicting the K-VRC character from 'Love, Death & Robots' with exceptional accuracy. The 3D rendering is high-quality, showcasing detailed textures like surface wear and the pixel grid on the face screen. The lighting is dramatic and professional, and there are no watermarks.",
+      "file_name": "k-vrc-orange-robot-love-death-robots-character-design.jpg",
+      "caption": "A detailed 3D render of K-VRC, the orange robot character from the Netflix series Love, Death & Robots, standing against a black background with a digital pixel face.",
+      "recommend": true,
+      "error": ""
+    }
+  },
+  {
+    "query": "K-VRC robot from Love Death Robots, orange robot character, cute robot design",
+    "image_info": {
+      "url": "https://public.blenderkit.com/thumbnails/assets/f04822015cf14933b1c34f2b6deb10bc/files/thumbnail_87c23d2b-7000-4a38-aa13-ddce3df35f21.jpg.2048x2048_q85.jpg",
+      "img_format": "JPEG",
+      "mode": "RGB",
+      "file_size": 54246,
+      "width": 1024,
+      "height": 1024,
+      "total_pixels": 1048576,
+      "basic_score": 0.9220609800219817,
+      "file_name": "k-vrc-orange-robot-love-death-robots-3d-render.jpg"
+    },
+    "llm_score": {
+      "success": true,
+      "relevance_score": 100.0,
+      "clarity_score": 95.0,
+      "watermark_score": 100.0,
+      "overall_score": 95.0,
+      "explanation": "The image is a perfect match for the search query, accurately depicting the K-VRC character from 'Love, Death & Robots'. The 3D render is high-resolution with sharp textures and distinct details. The white background makes it excellent for design reference or editing. There are no visible watermarks.",
+      "file_name": "k-vrc-orange-robot-love-death-robots-3d-render.jpg",
+      "caption": "A detailed 3D rendering of the character K-VRC from the series Love, Death & Robots. The small, orange robot features a helmet with white stripes, digital eyes on a black screen face, and weathered metallic textures, posed with arms outstretched against a white background.",
+      "recommend": true,
+      "error": ""
+    }
+  },
+  {
+    "query": "K-VRC robot from Love Death Robots, orange robot character, cute robot design",
+    "image_info": {
+      "url": "https://cdnb.artstation.com/p/assets/images/images/074/999/301/large/gamedev-004.jpg?1713472323",
+      "img_format": "JPEG",
+      "mode": "RGB",
+      "file_size": 456661,
+      "width": 1920,
+      "height": 1080,
+      "total_pixels": 2073600,
+      "basic_score": 0.741814093930772,
+      "file_name": "k-vrc-robot-love-death-robots-character-design-lighting.jpg"
+    },
+    "llm_score": {
+      "success": true,
+      "relevance_score": 95.0,
+      "clarity_score": 90.0,
+      "watermark_score": 100.0,
+      "overall_score": 90.0,
+      "explanation": "The image is an excellent match for the search query, depicting the specific character K-VRC from 'Love, Death & Robots' with high fidelity. It functions as a character design reference sheet, showing both a detailed close-up and a technical breakdown of lighting effects, which aligns perfectly with the 'character design' aspect of the query. The image is clean, sharp, and free of copyright watermarks, though it contains informational text.",
+      "file_name": "k-vrc-robot-love-death-robots-character-design-lighting.jpg",
+      "caption": "A 3D character design composite of the orange robot K-VRC from 'Love, Death & Robots', featuring a detailed portrait on the left and a grid of four smaller renders demonstrating different lighting combinations on the right.",
+      "recommend": true,
+      "error": ""
+    }
+  },
+  {
+    "query": "K-VRC robot from Love Death Robots, orange robot character, cute robot design",
+    "image_info": {
+      "url": "https://i.ytimg.com/vi/9fDBworyvx0/hq720.jpg?sqp=-oaymwEhCK4FEIIDSFryq4qpAxMIARUAAAAAGAElAADIQj0AgKJD&rs=AOn4CLBp-hV4CeaGyETpVKVt57ccpV0k9Q",
+      "img_format": "JPEG",
+      "mode": "RGB",
+      "file_size": 48381,
+      "width": 686,
+      "height": 386,
+      "total_pixels": 264796,
+      "basic_score": 0.7746576982354855,
+      "file_name": "love-death-robots-kvrc-orange-robot-3d-tutorial.jpg"
+    },
+    "llm_score": {
+      "success": true,
+      "relevance_score": 95.0,
+      "clarity_score": 85.0,
+      "watermark_score": 30.0,
+      "overall_score": 78.0,
+      "explanation": "The image features a highly accurate and detailed 3D render of the K-VRC robot, perfectly matching the character design query. However, the image is composed as a tutorial thumbnail, containing significant text overlays, software logos (Maya, Photoshop, etc.), and graphical elements that clutter the visual field, though the character itself remains clearly visible.",
+      "file_name": "love-death-robots-kvrc-orange-robot-3d-tutorial.jpg",
+      "caption": "A 3D rendering of the orange robot K-VRC from the series Love, Death & Robots, featured in a promotional graphic for a beginner 3D modeling tutorial.",
+      "recommend": true,
+      "error": ""
+    }
+  }
+]
