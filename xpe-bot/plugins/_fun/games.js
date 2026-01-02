@@ -32,6 +32,7 @@ export default {
 ║  🖼️ *meme*     - Obtener un meme    ║
 ║  💬 *frase*    - Frase aleatoria     ║
 ║  🎤 *rap*      - Batalla de rap      ║
+║  ❌⭕ *ttt*     - Tres en raya        ║
 ║                                      ║
 ║  💡 Uso: /comando                    ║
 ╚══════════════════════════════════════╝
@@ -527,6 +528,172 @@ export const subCommands = {
         await ctx.sendMessage({ text: '❌ Error en la batalla de rap.' });
         return false;
       }
+    },
+  
+    // ==========================================
+    // TTT (Tic-Tac-Toe) - Tres en raya
+    // ==========================================
+    ttt: {
+      name: 'ttt',
+      category: 'fun',
+      desc: 'Juega tres en raya contra el bot',
+      alias: ['tictactoe', 'tresenraya', 'gato'],
+      usage: '[/ttt nueva | /ttt 1-9]',
+      cooldown: 5,
+      requirePrefix: true,
+      isGroup: true,
+      onlyOwner: false,
+      onlyAdmin: false,
+      
+      async execute(ctx, { args, react }) {
+        try {
+          const vacio = '⬜';
+          const jugador = '❌';
+          const bot = '⭕';
+          
+          if (!global.tttGames) global.tttGames = {};
+          const chatId = ctx.key.remoteJid;
+          
+          if (args[0]?.toLowerCase() === 'nueva' || args[0]?.toLowerCase() === 'new') {
+            global.tttGames[chatId] = {
+              tablero: Array(9).fill(vacio),
+              turno: 'jugador',
+              activa: true
+            };
+            
+            await ctx.sendMessage({
+              text: `❌⭕ *TRES EN RAYA* ❌⭕\n\n📊 Tablero:\n\n` +
+                    ` 1 │ 2 │ 3 \n` +
+                    `───┼───┼───\n` +
+                    ` 4 │ 5 │ 6 \n` +
+                    `───┼───┼───\n` +
+                    ` 7 │ 8 │ 9 \n\n` +
+                    `🎮 Tu turno! Usa /ttt [1-9]`
+            });
+            await react('🎮');
+            return true;
+          }
+          
+          if (!global.tttGames[chatId] || !global.tttGames[chatId].activa) {
+            await ctx.sendMessage({
+              text: `❌⭕ *TRES EN RAYA*\n\n🎮 Nueva: /ttt nueva`
+            });
+            return true;
+          }
+          
+          const juego = global.tttGames[chatId];
+          
+          if (juego.turno !== 'jugador') {
+            await ctx.sendMessage({ text: `⏳ Espera tu turno...` });
+            return true;
+          }
+          
+          const pos = parseInt(args[0]);
+          if (isNaN(pos) || pos < 1 || pos > 9) {
+            await ctx.sendMessage({
+              text: `❌ Usa: /ttt [1-9]`
+            });
+            return true;
+          }
+          
+          const idx = pos - 1;
+          if (juego.tablero[idx] !== vacio) {
+            await ctx.sendMessage({ text: `❌ Posición ocupada!` });
+            return true;
+          }
+          
+          juego.tablero[idx] = jugador;
+          
+          if (_verificarVictoria(juego.tablero, jugador)) {
+            juego.activa = false;
+            await ctx.sendMessage({ text: `🎉 ¡GANASTE! 🎉` });
+            await react('🎉');
+            return true;
+          }
+          
+          if (_verificarEmpate(juego.tablero)) {
+            juego.activa = false;
+            await ctx.sendMessage({ text: `🤝 ¡EMPATE! 🤝` });
+            await react('🤝');
+            return true;
+          }
+          
+          juego.turno = 'bot';
+          await ctx.sendMessage({ text: `🤖 Bot pensando...` });
+          
+          await new Promise(r => setTimeout(r, 800));
+          
+          const movBot = _movimientoBot(juego.tablero, vacio, bot, jugador);
+          if (movBot !== -1) {
+            juego.tablero[movBot] = bot;
+          }
+          
+          if (_verificarVictoria(juego.tablero, bot)) {
+            juego.activa = false;
+            await ctx.sendMessage({ text: `😢 ¡PERDISTE! 😢` });
+            await react('😢');
+            return true;
+          }
+          
+          if (_verificarEmpate(juego.tablero)) {
+            juego.activa = false;
+            await ctx.sendMessage({ text: `🤝 ¡EMPATE! 🤝` });
+            await react('🤝');
+            return true;
+          }
+          
+          juego.turno = 'jugador';
+          
+          await ctx.sendMessage({
+            text: `❌⭕ *TU TURNO*\n\n` +
+                  ` ${juego.tablero[0]} │ ${juego.tablero[1]} │ ${juego.tablero[2]} \n` +
+                  ` ───┼───┼───\n` +
+                  ` ${juego.tablero[3]} │ ${juego.tablero[4]} │ ${juego.tablero[5]} \n` +
+                  ` ───┼───┼───\n` +
+                  ` ${juego.tablero[6]} │ ${juego.tablero[7]} │ ${juego.tablero[8]} \n\n` +
+                  `🎮 /ttt [1-9]`
+          });
+          await react('🎮');
+          return true;
+        } catch (error) {
+          console.error('Error ttt:', error);
+          await ctx.sendMessage({ text: '❌ Error en ttt.' });
+          return false;
+        }
+      }
     }
   }
 };
+
+// Funciones TTT
+function _verificarVictoria(tablero, player) {
+  const comb = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+  return comb.some(c => c.every(i => tablero[i] === player));
+}
+
+function _verificarEmpate(tablero) {
+  return tablero.every(c => c !== '⬜');
+}
+
+function _movimientoBot(tablero, vacio, bot, player) {
+  for (let i = 0; i < 9; i++) {
+    if (tablero[i] === vacio) {
+      tablero[i] = bot;
+      if (_verificarVictoria(tablero, bot)) return i;
+      tablero[i] = vacio;
+    }
+  }
+  for (let i = 0; i < 9; i++) {
+    if (tablero[i] === vacio) {
+      tablero[i] = player;
+      if (_verificarVictoria(tablero, player)) return i;
+      tablero[i] = vacio;
+    }
+  }
+  if (tablero[4] === vacio) return 4;
+  const esquinas = [0,2,6,8].filter(i => tablero[i] === vacio);
+  if (esquinas.length > 0) return esquinas[Math.floor(Math.random() * esquinas.length)];
+  const libres = [];
+  for (let i = 0; i < 9; i++) if (tablero[i] === vacio) libres.push(i);
+  return libres.length > 0 ? libres[Math.floor(Math.random() * libres.length)] : -1;
+}
